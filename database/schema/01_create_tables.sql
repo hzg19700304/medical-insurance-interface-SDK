@@ -39,6 +39,9 @@ CREATE TABLE `medical_interface_config` (
     `region_specific` JSON DEFAULT ('{}') COMMENT '地区特殊配置',
     `province_overrides` JSON DEFAULT ('{}') COMMENT '省份级别覆盖配置',
     
+    -- HIS集成配置
+    `his_integration_config` JSON DEFAULT ('{}') COMMENT 'HIS集成配置（字段映射、同步配置、回写配置等）',
+    
     -- 接口特性
     `is_active` BOOLEAN DEFAULT TRUE COMMENT '是否启用',
     `requires_auth` BOOLEAN DEFAULT TRUE COMMENT '是否需要认证',
@@ -281,6 +284,223 @@ CREATE TABLE `medical_interface_stats` (
     KEY `idx_success_rate` (`success_rate`),
     KEY `idx_total_calls` (`total_calls`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='接口调用统计表';
+
+-- =====================================================
+-- 6. HIS数据同步日志表 (his_data_sync_log)
+-- 用途：记录HIS系统数据同步操作日志
+-- =====================================================
+CREATE TABLE `his_data_sync_log` (
+    `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+    
+    -- 同步标识
+    `sync_id` VARCHAR(50) NOT NULL COMMENT '同步ID',
+    `api_code` VARCHAR(10) NOT NULL COMMENT '接口编码',
+    `org_code` VARCHAR(20) NOT NULL COMMENT '机构编码',
+    
+    -- 同步数据
+    `medical_data` JSON DEFAULT NULL COMMENT '医保数据',
+    `his_data` JSON DEFAULT NULL COMMENT 'HIS数据',
+    
+    -- 同步配置
+    `sync_direction` VARCHAR(20) DEFAULT 'to_his' COMMENT '同步方向（to_his/from_his/bidirectional）',
+    `sync_status` VARCHAR(20) NOT NULL COMMENT '同步状态（success/failed/pending）',
+    
+    -- 同步结果
+    `synced_records` INT DEFAULT 0 COMMENT '同步记录数',
+    `failed_records` INT DEFAULT 0 COMMENT '失败记录数',
+    `conflict_records` INT DEFAULT 0 COMMENT '冲突记录数',
+    `error_message` TEXT DEFAULT NULL COMMENT '错误信息',
+    
+    -- 时间信息
+    `sync_time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '同步时间',
+    `duration_ms` INT DEFAULT NULL COMMENT '同步耗时（毫秒）',
+    
+    -- 审计字段
+    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `uk_sync_id` (`sync_id`),
+    KEY `idx_api_org_time` (`api_code`, `org_code`, `sync_time` DESC),
+    KEY `idx_sync_status` (`sync_status`),
+    KEY `idx_sync_direction` (`sync_direction`),
+    KEY `idx_sync_time` (`sync_time`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='HIS数据同步日志表';
+
+-- =====================================================
+-- 7. HIS回写日志表 (his_writeback_log)
+-- 用途：记录医保结果回写到HIS系统的操作日志
+-- =====================================================
+CREATE TABLE `his_writeback_log` (
+    `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+    
+    -- 回写标识
+    `writeback_id` VARCHAR(50) NOT NULL COMMENT '回写ID',
+    `api_code` VARCHAR(10) NOT NULL COMMENT '接口编码',
+    `org_code` VARCHAR(20) NOT NULL COMMENT '机构编码',
+    
+    -- 回写数据
+    `medical_result` JSON DEFAULT NULL COMMENT '医保处理结果',
+    `his_data` JSON DEFAULT NULL COMMENT 'HIS回写数据',
+    
+    -- 回写配置
+    `writeback_operation` VARCHAR(20) DEFAULT 'update' COMMENT '回写操作（insert/update/upsert）',
+    `writeback_status` VARCHAR(20) NOT NULL COMMENT '回写状态（success/failed/pending）',
+    
+    -- 回写结果
+    `written_records` INT DEFAULT 0 COMMENT '回写记录数',
+    `failed_records` INT DEFAULT 0 COMMENT '失败记录数',
+    `error_message` TEXT DEFAULT NULL COMMENT '错误信息',
+    
+    -- 时间信息
+    `writeback_time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '回写时间',
+    `duration_ms` INT DEFAULT NULL COMMENT '回写耗时（毫秒）',
+    
+    -- 审计字段
+    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `uk_writeback_id` (`writeback_id`),
+    KEY `idx_api_org_time` (`api_code`, `org_code`, `writeback_time` DESC),
+    KEY `idx_writeback_status` (`writeback_status`),
+    KEY `idx_writeback_operation` (`writeback_operation`),
+    KEY `idx_writeback_time` (`writeback_time`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='HIS回写日志表';
+
+-- =====================================================
+-- 8. 数据一致性检查表 (data_consistency_checks)
+-- 用途：记录医保系统与HIS系统的数据一致性检查结果
+-- =====================================================
+CREATE TABLE `data_consistency_checks` (
+    `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+    
+    -- 检查标识
+    `check_id` VARCHAR(50) NOT NULL COMMENT '检查ID',
+    `api_code` VARCHAR(10) NOT NULL COMMENT '接口编码',
+    `org_code` VARCHAR(20) NOT NULL COMMENT '机构编码',
+    
+    -- 检查配置
+    `check_period_hours` INT DEFAULT 24 COMMENT '检查时间范围（小时）',
+    `check_type` VARCHAR(20) DEFAULT 'full' COMMENT '检查类型（full/incremental）',
+    
+    -- 检查结果
+    `check_result` JSON DEFAULT NULL COMMENT '检查结果详情',
+    `check_status` VARCHAR(20) NOT NULL COMMENT '检查状态（success/failed/running）',
+    
+    -- 统计信息
+    `total_medical_records` INT DEFAULT 0 COMMENT '医保记录总数',
+    `total_his_records` INT DEFAULT 0 COMMENT 'HIS记录总数',
+    `consistent_count` INT DEFAULT 0 COMMENT '一致记录数',
+    `inconsistent_count` INT DEFAULT 0 COMMENT '不一致记录数',
+    `missing_in_his` INT DEFAULT 0 COMMENT 'HIS中缺失记录数',
+    `missing_in_medical` INT DEFAULT 0 COMMENT '医保中缺失记录数',
+    
+    -- 时间信息
+    `check_time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '检查时间',
+    `duration_ms` INT DEFAULT NULL COMMENT '检查耗时（毫秒）',
+    
+    -- 审计字段
+    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `uk_check_id` (`check_id`),
+    KEY `idx_api_org_time` (`api_code`, `org_code`, `check_time` DESC),
+    KEY `idx_check_status` (`check_status`),
+    KEY `idx_check_time` (`check_time`),
+    KEY `idx_inconsistent_count` (`inconsistent_count`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='数据一致性检查表';
+
+-- =====================================================
+-- 9. 数据同步冲突表 (data_sync_conflicts)
+-- 用途：记录数据同步过程中发现的冲突及其解决状态
+-- =====================================================
+CREATE TABLE `data_sync_conflicts` (
+    `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+    
+    -- 冲突标识
+    `conflict_id` VARCHAR(50) NOT NULL COMMENT '冲突ID',
+    `api_code` VARCHAR(10) NOT NULL COMMENT '接口编码',
+    `org_code` VARCHAR(20) NOT NULL COMMENT '机构编码',
+    
+    -- 冲突数据
+    `medical_data` JSON DEFAULT NULL COMMENT '医保系统数据',
+    `his_data` JSON DEFAULT NULL COMMENT 'HIS系统数据',
+    `conflict_fields` JSON DEFAULT NULL COMMENT '冲突字段详情',
+    
+    -- 冲突信息
+    `conflict_type` VARCHAR(50) NOT NULL COMMENT '冲突类型（data_mismatch/missing_record/duplicate_record）',
+    `conflict_description` TEXT DEFAULT NULL COMMENT '冲突描述',
+    `conflict_severity` VARCHAR(20) DEFAULT 'medium' COMMENT '冲突严重程度（low/medium/high/critical）',
+    
+    -- 解决状态
+    `resolved` BOOLEAN DEFAULT FALSE COMMENT '是否已解决',
+    `resolution_strategy` VARCHAR(50) DEFAULT NULL COMMENT '解决策略（use_medical/use_his/manual_merge）',
+    `resolution_result` JSON DEFAULT NULL COMMENT '解决结果',
+    `resolver_id` VARCHAR(50) DEFAULT NULL COMMENT '解决人员ID',
+    `resolved_at` TIMESTAMP NULL COMMENT '解决时间',
+    
+    -- 时间信息
+    `detected_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '发现时间',
+    
+    -- 审计字段
+    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `uk_conflict_id` (`conflict_id`),
+    KEY `idx_api_org_detected` (`api_code`, `org_code`, `detected_at` DESC),
+    KEY `idx_conflict_type` (`conflict_type`),
+    KEY `idx_resolved` (`resolved`),
+    KEY `idx_conflict_severity` (`conflict_severity`),
+    KEY `idx_detected_at` (`detected_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='数据同步冲突表';
+
+-- =====================================================
+-- 10. HIS集成配置表 (his_integration_mapping)
+-- 用途：存储HIS系统集成的详细配置信息
+-- =====================================================
+CREATE TABLE `his_integration_mapping` (
+    `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+    
+    -- 映射标识
+    `mapping_id` VARCHAR(50) NOT NULL COMMENT '映射ID',
+    `api_code` VARCHAR(10) NOT NULL COMMENT '接口编码',
+    `org_code` VARCHAR(20) NOT NULL COMMENT '机构编码',
+    
+    -- 映射配置
+    `field_mappings` JSON NOT NULL COMMENT '字段映射配置',
+    `data_transformations` JSON DEFAULT ('{}') COMMENT '数据转换规则',
+    `sync_config` JSON DEFAULT ('{}') COMMENT '同步配置',
+    `writeback_config` JSON DEFAULT ('{}') COMMENT '回写配置',
+    `consistency_config` JSON DEFAULT ('{}') COMMENT '一致性检查配置',
+    
+    -- HIS表信息
+    `his_table_name` VARCHAR(100) NOT NULL COMMENT 'HIS表名',
+    `his_primary_key` VARCHAR(50) DEFAULT 'id' COMMENT 'HIS表主键',
+    `his_time_field` VARCHAR(50) DEFAULT 'updated_at' COMMENT 'HIS表时间字段',
+    
+    -- 配置状态
+    `is_active` BOOLEAN DEFAULT TRUE COMMENT '是否启用',
+    `mapping_version` VARCHAR(20) DEFAULT '1.0' COMMENT '映射版本',
+    `last_tested_at` TIMESTAMP NULL COMMENT '最后测试时间',
+    `test_status` VARCHAR(20) DEFAULT 'unknown' COMMENT '测试状态',
+    
+    -- 审计字段
+    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    `created_by` VARCHAR(100) COMMENT '创建人',
+    `updated_by` VARCHAR(100) COMMENT '更新人',
+    
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `uk_mapping_id` (`mapping_id`),
+    UNIQUE KEY `uk_api_org` (`api_code`, `org_code`),
+    KEY `idx_his_table` (`his_table_name`),
+    KEY `idx_is_active` (`is_active`),
+    KEY `idx_test_status` (`test_status`),
+    KEY `idx_updated_at` (`updated_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='HIS集成配置表';
 
 -- 恢复外键检查
 SET FOREIGN_KEY_CHECKS = 1;

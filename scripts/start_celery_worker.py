@@ -76,16 +76,34 @@ def start_celery_flower():
     # 设置环境变量
     os.environ.setdefault('PYTHONPATH', str(project_root))
     
+    # 加载环境变量
+    from dotenv import load_dotenv
+    env_path = project_root / 'medical_insurance_sdk' / '.env'
+    load_dotenv(env_path)
+    
+    # 获取Redis配置
+    redis_host = os.getenv('REDIS_HOST', 'localhost')
+    redis_port = os.getenv('REDIS_PORT', '6379')
+    redis_db = os.getenv('REDIS_DB', '0')
+    redis_password = os.getenv('REDIS_PASSWORD', '')
+    
+    # 构建Redis URL
+    if redis_password:
+        broker_url = f'redis://:{redis_password}@{redis_host}:{redis_port}/{redis_db}'
+    else:
+        broker_url = f'redis://{redis_host}:{redis_port}/{redis_db}'
+    
     # Celery flower命令
     cmd = [
         'celery',
         '-A', 'medical_insurance_sdk.async_processing.celery_app',
         'flower',
-        '--port=5555'
+        '--port=5555',
+        f'--broker={broker_url}'
     ]
     
     print("Starting Celery Flower...")
-    print(f"Command: {' '.join(cmd)}")
+    print(f"Command: {' '.join(cmd[:5])} --broker=redis://***@{redis_host}:{redis_port}/{redis_db}")
     print(f"Working directory: {project_root}")
     print("Flower will be available at: http://localhost:5555")
     print("-" * 50)

@@ -144,6 +144,7 @@ class OrganizationConfig:
     sign_type: str = "SM2"
     timeout_config: Dict[str, int] = None
     encryption_config: Dict[str, Any] = None
+    extra_config: Dict[str, Any] = None
     gateway_config: Dict[str, Any] = None
     is_active: bool = True
     environment: str = "production"
@@ -195,6 +196,7 @@ class OrganizationConfig:
             sign_type=record.get('sign_type', 'SM2'),
             timeout_config=safe_json_loads(record.get('timeout_config')),
             encryption_config=safe_json_loads(record.get('encryption_config')),
+            extra_config=safe_json_loads(record.get('extra_config')),
             gateway_config=safe_json_loads(record.get('gateway_config')),
             is_active=record.get('is_active', True),
             environment=record.get('environment', 'production'),

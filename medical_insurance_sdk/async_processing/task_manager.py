@@ -243,8 +243,6 @@ class TaskManager:
                     WHERE task_id = %s
                 """, (task_id,))
                 
-                row = cursor.fetchone()
-                
                 result = cursor.fetchone()
                 
                 if result and result['data']:

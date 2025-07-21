@@ -35,6 +35,16 @@ from .universal_processor import UniversalInterfaceProcessor, DataHelper
 from .http_client import HTTPClient, MedicalInsuranceHTTPClient
 from .log_manager import LogManager, StructuredFormatter, LogContext, log_api_call
 from .data_manager import DataManager, LogQuery, StatQuery, StatResult
+from .error_handler import (
+    ErrorHandler,
+    RetryConfig,
+    CircuitBreaker,
+    FallbackHandler,
+    default_error_handler,
+    handle_medical_interface_error,
+    handle_database_error,
+    handle_cache_error
+)
 
 __all__ = [
     "DatabaseManager",
@@ -76,4 +86,12 @@ __all__ = [
     "LogQuery",
     "StatQuery",
     "StatResult",
+    "ErrorHandler",
+    "RetryConfig",
+    "CircuitBreaker",
+    "FallbackHandler",
+    "default_error_handler",
+    "handle_medical_interface_error",
+    "handle_database_error",
+    "handle_cache_error",
 ]

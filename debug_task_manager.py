@@ -58,8 +58,9 @@ def debug_database_operations():
                 
                 # 检查表中的数据
                 print("\n--- 检查表数据 ---")
-                cursor.execute("SELECT COUNT(*) FROM async_task_status")
-                count = cursor.fetchone()[0]
+                cursor.execute("SELECT COUNT(*) as count FROM async_task_status")
+                count_result = cursor.fetchone()
+                count = count_result['count'] if count_result else 0
                 print(f"表中记录总数: {count}")
                 
                 # 插入测试数据
@@ -96,11 +97,11 @@ def debug_database_operations():
                 row = cursor.fetchone()
                 if row:
                     print(f"✓ 查询成功:")
-                    print(f"  任务ID: {row[0]}")
-                    print(f"  状态: {row[1]}")
-                    print(f"  数据: {row[2]}")
-                    print(f"  创建时间: {row[3]}")
-                    print(f"  更新时间: {row[4]}")
+                    print(f"  任务ID: {row['task_id']}")
+                    print(f"  状态: {row['status']}")
+                    print(f"  数据: {row['data']}")
+                    print(f"  创建时间: {row['created_at']}")
+                    print(f"  更新时间: {row['updated_at']}")
                 else:
                     print("✗ 查询失败，未找到数据")
                 
@@ -119,7 +120,7 @@ def debug_database_operations():
                 status_results = cursor.fetchall()
                 print(f"状态统计查询结果: {status_results}")
                 
-                status_counts = {row[0]: row[1] for row in status_results}
+                status_counts = {row['status']: row['count'] for row in status_results}
                 print(f"状态统计字典: {status_counts}")
                 
                 # 总数统计
@@ -131,7 +132,7 @@ def debug_database_operations():
                 
                 total_result = cursor.fetchone()
                 print(f"总数查询结果: {total_result}")
-                total_count = total_result[0] if total_result else 0
+                total_count = total_result['total_count'] if total_result else 0
                 print(f"总数: {total_count}")
                 
                 # 构建最终统计结果
