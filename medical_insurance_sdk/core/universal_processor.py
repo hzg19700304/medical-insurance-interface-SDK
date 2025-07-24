@@ -60,17 +60,10 @@ class UniversalInterfaceProcessor:
             # 2. 数据预处理（应用默认值、数据转换等）
             processed_data = self._preprocess_input_data(input_data, interface_config)
             
-            # 3. 数据验证
-            validation_result = self._validate_input_data(api_code, processed_data, org_code)
-            if not validation_result.is_valid:
-                self._processing_stats['validation_errors'] += 1
-                raise ValidationException(
-                    "输入数据验证失败", 
-                    field_errors=validation_result.errors
-                )
-            
-            # 4. 构建请求数据
+            # 3. 构建请求数据
             request_data = self._build_request_data(processed_data, interface_config, org_code)
+            
+            # 4. 数据验证由SDK核心统一处理，这里不再重复验证
             
             # 5. 调用SDK核心
             response = self._call_sdk_core(api_code, request_data, org_code, **kwargs)

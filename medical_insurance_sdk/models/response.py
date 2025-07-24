@@ -17,11 +17,14 @@ class MedicalInsuranceResponse:
     warn_msg: str = ""  # 警告信息
     cainfo: str = ""  # CA信息
     signtype: str = ""  # 签名类型
+    parsed_data: Dict[str, Any] = None  # 解析后的数据
 
     def __post_init__(self):
         """初始化后处理"""
         if self.output is None:
             self.output = {}
+        if self.parsed_data is None:
+            self.parsed_data = {}
 
     @classmethod
     def from_dict(cls, data: Dict[str, Any]) -> "MedicalInsuranceResponse":
@@ -36,6 +39,7 @@ class MedicalInsuranceResponse:
             warn_msg=data.get("warn_msg", ""),
             cainfo=data.get("cainfo", ""),
             signtype=data.get("signtype", ""),
+            parsed_data=data.get("parsed_data", {}),
         )
 
     def is_success(self) -> bool:
@@ -44,7 +48,7 @@ class MedicalInsuranceResponse:
 
     def to_dict(self) -> Dict[str, Any]:
         """转换为字典格式"""
-        return {
+        result = {
             "infcode": self.infcode,
             "inf_refmsgid": self.inf_refmsgid,
             "refmsg_time": self.refmsg_time,
@@ -55,3 +59,9 @@ class MedicalInsuranceResponse:
             "cainfo": self.cainfo,
             "signtype": self.signtype,
         }
+        
+        # 如果有解析后的数据，将其合并到结果中
+        if self.parsed_data:
+            result.update(self.parsed_data)
+            
+        return result

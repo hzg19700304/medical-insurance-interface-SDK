@@ -64,13 +64,18 @@ class MedicalInsuranceClient:
         try:
             self.logger.info(f"同步调用医保接口: {api_code}, 机构: {org_code}")
             
-            # 使用通用接口处理器调用
-            result = self.universal_processor.call_interface(
+            # 直接调用SDK核心，构造SDK期望的数据格式
+            sdk_data = {"data": data}
+            result = self.sdk.call(
                 api_code=api_code,
-                input_data=data,
+                data=sdk_data,
                 org_code=org_code,
                 **kwargs
             )
+            
+            # 将SDK响应转换为字典格式
+            if hasattr(result, 'to_dict'):
+                result = result.to_dict()
             
             self.logger.info(f"同步调用完成: {api_code}")
             return result

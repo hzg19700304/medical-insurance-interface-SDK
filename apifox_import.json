@@ -1,0 +1,480 @@
+{
+  "apifoxVersion": "2.0.0",
+  "info": {
+    "name": "医保接口SDK测试",
+    "description": "医保接口1101和2201的Mock测试接口",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://m1.apifoxmock.com/m1/6809354-6523017-default",
+      "description": "Mock服务器"
+    }
+  ],
+  "apis": [
+    {
+      "name": "1101人员信息查询",
+      "method": "POST",
+      "path": "/fsi/api/rsfComIfsService/callService",
+      "description": "根据就诊凭证信息查询人员基本信息、参保信息等",
+      "tags": ["医保接口"],
+      "requestBody": {
+        "type": "application/json",
+        "jsonSchema": {
+          "type": "object",
+          "properties": {
+            "infno": {
+              "type": "string",
+              "description": "接口编号",
+              "example": "1101"
+            },
+            "msgid": {
+              "type": "string",
+              "description": "消息ID",
+              "example": "test_msg_20240115001"
+            },
+            "mdtrtarea_admvs": {
+              "type": "string",
+              "description": "就医地医保区划",
+              "example": "4301"
+            },
+            "insuplc_admdvs": {
+              "type": "string",
+              "description": "参保地医保区划",
+              "example": "4301"
+            },
+            "recer_sys_code": {
+              "type": "string",
+              "description": "接收方系统代码",
+              "example": "MDY32"
+            },
+            "infver": {
+              "type": "string",
+              "description": "接口版本号",
+              "example": "V1.0"
+            },
+            "opter_type": {
+              "type": "string",
+              "description": "操作员类型",
+              "example": "1"
+            },
+            "opter": {
+              "type": "string",
+              "description": "操作员",
+              "example": "test_user"
+            },
+            "opter_name": {
+              "type": "string",
+              "description": "操作员姓名",
+              "example": "测试用户"
+            },
+            "inf_time": {
+              "type": "string",
+              "description": "交易时间",
+              "example": "20240115103000"
+            },
+            "fixmedins_code": {
+              "type": "string",
+              "description": "定点医药机构编号",
+              "example": "TEST001"
+            },
+            "fixmedins_name": {
+              "type": "string",
+              "description": "定点医药机构名称",
+              "example": "测试医院"
+            },
+            "input": {
+              "type": "object",
+              "properties": {
+                "mdtrt_cert_type": {
+                  "type": "string",
+                  "description": "就诊凭证类型：01-电子凭证，02-身份证，03-社保卡",
+                  "example": "02"
+                },
+                "mdtrt_cert_no": {
+                  "type": "string",
+                  "description": "就诊凭证编号",
+                  "example": "430123199001011234"
+                },
+                "psn_cert_type": {
+                  "type": "string",
+                  "description": "人员证件类型：01-身份证",
+                  "example": "01"
+                },
+                "certno": {
+                  "type": "string",
+                  "description": "证件号码",
+                  "example": "430123199001011234"
+                },
+                "psn_name": {
+                  "type": "string",
+                  "description": "人员姓名",
+                  "example": "张三"
+                },
+                "card_sn": {
+                  "type": "string",
+                  "description": "卡识别码（使用社保卡时必填）",
+                  "example": "1234567890123456"
+                }
+              },
+              "required": ["mdtrt_cert_type", "mdtrt_cert_no", "psn_cert_type", "certno", "psn_name"]
+            }
+          },
+          "required": ["infno", "msgid", "input"]
+        }
+      },
+      "responses": [
+        {
+          "name": "成功响应",
+          "code": 200,
+          "contentType": "application/json",
+          "jsonSchema": {
+            "type": "object",
+            "properties": {
+              "infcode": {
+                "type": "integer",
+                "example": 0
+              },
+              "inf_refmsgid": {
+                "type": "string",
+                "example": "MSG-1101-001"
+              },
+              "refmsg_time": {
+                "type": "string",
+                "example": "2024-01-15 10:30:00"
+              },
+              "respond_time": {
+                "type": "string",
+                "example": "2024-01-15 10:30:00"
+              },
+              "err_msg": {
+                "type": "string",
+                "example": ""
+              },
+              "output": {
+                "type": "object",
+                "properties": {
+                  "baseinfo": {
+                    "type": "object",
+                    "properties": {
+                      "psn_no": {
+                        "type": "string",
+                        "example": "123456789"
+                      },
+                      "psn_name": {
+                        "type": "string",
+                        "example": "张三"
+                      },
+                      "gend": {
+                        "type": "string",
+                        "example": "1"
+                      },
+                      "brdy": {
+                        "type": "string",
+                        "example": "1990-01-01"
+                      },
+                      "certno": {
+                        "type": "string",
+                        "example": "430123199001011234"
+                      },
+                      "tel": {
+                        "type": "string",
+                        "example": "13800138000"
+                      },
+                      "addr": {
+                        "type": "string",
+                        "example": "湖南省长沙市岳麓区测试街道123号"
+                      }
+                    }
+                  },
+                  "insuinfo": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "balc": {
+                          "type": "string",
+                          "example": "5000.00"
+                        },
+                        "insutype": {
+                          "type": "string",
+                          "example": "310"
+                        },
+                        "psn_insu_stas": {
+                          "type": "string",
+                          "example": "1"
+                        }
+                      }
+                    }
+                  },
+                  "idetinfo": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "psn_idet_type": {
+                          "type": "string",
+                          "example": "1"
+                        },
+                        "psn_type_lv": {
+                          "type": "string",
+                          "example": "1"
+                        },
+                        "begntime": {
+                          "type": "string",
+                          "example": "2023-01-01"
+                        },
+                        "endtime": {
+                          "type": "string",
+                          "example": "2025-12-31"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "example": {
+            "infcode": 0,
+            "inf_refmsgid": "MSG-1101-001",
+            "refmsg_time": "2024-01-15 10:30:00",
+            "respond_time": "2024-01-15 10:30:00",
+            "err_msg": "",
+            "output": {
+              "baseinfo": {
+                "psn_no": "123456789",
+                "psn_name": "张三",
+                "gend": "1",
+                "brdy": "1990-01-01",
+                "certno": "430123199001011234",
+                "tel": "13800138000",
+                "addr": "湖南省长沙市岳麓区测试街道123号"
+              },
+              "insuinfo": [
+                {
+                  "balc": "5000.00",
+                  "insutype": "310",
+                  "psn_insu_stas": "1"
+                }
+              ],
+              "idetinfo": [
+                {
+                  "psn_idet_type": "1",
+                  "psn_type_lv": "1",
+                  "begntime": "2023-01-01",
+                  "endtime": "2025-12-31"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "2201门诊结算",
+      "method": "POST",
+      "path": "/fsi/api/rsfComIfsService/callService",
+      "description": "门诊费用结算，计算医保支付和个人支付金额",
+      "tags": ["医保接口"],
+      "requestBody": {
+        "type": "application/json",
+        "jsonSchema": {
+          "type": "object",
+          "properties": {
+            "infno": {
+              "type": "string",
+              "description": "接口编号",
+              "example": "2201"
+            },
+            "msgid": {
+              "type": "string",
+              "description": "消息ID",
+              "example": "test_msg_20240115002"
+            },
+            "mdtrtarea_admvs": {
+              "type": "string",
+              "description": "就医地医保区划",
+              "example": "4301"
+            },
+            "insuplc_admdvs": {
+              "type": "string",
+              "description": "参保地医保区划",
+              "example": "4301"
+            },
+            "recer_sys_code": {
+              "type": "string",
+              "description": "接收方系统代码",
+              "example": "MDY32"
+            },
+            "infver": {
+              "type": "string",
+              "description": "接口版本号",
+              "example": "V1.0"
+            },
+            "opter_type": {
+              "type": "string",
+              "description": "操作员类型",
+              "example": "1"
+            },
+            "opter": {
+              "type": "string",
+              "description": "操作员",
+              "example": "test_user"
+            },
+            "opter_name": {
+              "type": "string",
+              "description": "操作员姓名",
+              "example": "测试用户"
+            },
+            "inf_time": {
+              "type": "string",
+              "description": "交易时间",
+              "example": "20240115103000"
+            },
+            "fixmedins_code": {
+              "type": "string",
+              "description": "定点医药机构编号",
+              "example": "TEST001"
+            },
+            "fixmedins_name": {
+              "type": "string",
+              "description": "定点医药机构名称",
+              "example": "测试医院"
+            },
+            "input": {
+              "type": "object",
+              "properties": {
+                "mdtrt_id": {
+                  "type": "string",
+                  "description": "就医登记号",
+                  "example": "MDT20240115001"
+                },
+                "psn_no": {
+                  "type": "string",
+                  "description": "人员编号",
+                  "example": "123456789"
+                },
+                "chrg_bchno": {
+                  "type": "string",
+                  "description": "收费批次号",
+                  "example": "CHG20240115001"
+                },
+                "acct_used_flag": {
+                  "type": "string",
+                  "description": "个人账户使用标志：0-不使用，1-使用",
+                  "example": "1"
+                },
+                "insutype": {
+                  "type": "string",
+                  "description": "险种类型：310-职工基本医疗保险",
+                  "example": "310"
+                },
+                "invono": {
+                  "type": "string",
+                  "description": "发票号",
+                  "example": "INV20240115001"
+                }
+              },
+              "required": ["mdtrt_id", "psn_no", "chrg_bchno"]
+            }
+          },
+          "required": ["infno", "msgid", "input"]
+        }
+      },
+      "responses": [
+        {
+          "name": "成功响应",
+          "code": 200,
+          "contentType": "application/json",
+          "jsonSchema": {
+            "type": "object",
+            "properties": {
+              "infcode": {
+                "type": "integer",
+                "example": 0
+              },
+              "inf_refmsgid": {
+                "type": "string",
+                "example": "MSG-2201-001"
+              },
+              "refmsg_time": {
+                "type": "string",
+                "example": "2024-01-15 10:30:00"
+              },
+              "respond_time": {
+                "type": "string",
+                "example": "2024-01-15 10:30:00"
+              },
+              "err_msg": {
+                "type": "string",
+                "example": ""
+              },
+              "output": {
+                "type": "object",
+                "properties": {
+                  "setlinfo": {
+                    "type": "object",
+                    "properties": {
+                      "setl_id": {
+                        "type": "string",
+                        "example": "SETL20240115001"
+                      },
+                      "setl_totlnum": {
+                        "type": "string",
+                        "example": "1000.00"
+                      },
+                      "hifp_pay": {
+                        "type": "string",
+                        "example": "800.00"
+                      },
+                      "psn_pay": {
+                        "type": "string",
+                        "example": "200.00"
+                      },
+                      "acct_pay": {
+                        "type": "string",
+                        "example": "100.00"
+                      },
+                      "psn_cash_pay": {
+                        "type": "string",
+                        "example": "100.00"
+                      },
+                      "setl_time": {
+                        "type": "string",
+                        "example": "2024-01-15 10:30:00"
+                      },
+                      "invono": {
+                        "type": "string",
+                        "example": "INV20240115001"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "example": {
+            "infcode": 0,
+            "inf_refmsgid": "MSG-2201-001",
+            "refmsg_time": "2024-01-15 10:30:00",
+            "respond_time": "2024-01-15 10:30:00",
+            "err_msg": "",
+            "output": {
+              "setlinfo": {
+                "setl_id": "SETL20240115001",
+                "setl_totlnum": "1000.00",
+                "hifp_pay": "800.00",
+                "psn_pay": "200.00",
+                "acct_pay": "100.00",
+                "psn_cash_pay": "100.00",
+                "setl_time": "2024-01-15 10:30:00",
+                "invono": "INV20240115001"
+              }
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

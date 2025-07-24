@@ -177,6 +177,10 @@ class MySQLConnectionPool:
     def _create_pool(self):
         """创建MySQL连接池"""
         try:
+            # 调试：打印配置信息
+            print(f"[DEBUG] 创建连接池，配置密码长度: {len(self.config.password)}")
+            print(f"[DEBUG] 配置密码前3位: {self.config.password[:3] if self.config.password else '(空)'}")
+            
             # 构建连接参数
             connection_kwargs = {
                 'host': self.config.host,
@@ -192,6 +196,10 @@ class MySQLConnectionPool:
                 'cursorclass': pymysql.cursors.DictCursor,
                 'use_unicode': self.config.use_unicode
             }
+            
+            # 调试：打印连接参数中的密码
+            print(f"[DEBUG] 连接参数密码长度: {len(connection_kwargs['password'])}")
+            print(f"[DEBUG] 连接参数密码前3位: {connection_kwargs['password'][:3] if connection_kwargs['password'] else '(空)'}")
             
             # 添加SSL配置（如果需要）
             if hasattr(self.config, 'ssl_config') and self.config.ssl_config:

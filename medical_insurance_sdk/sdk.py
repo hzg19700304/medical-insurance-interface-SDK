@@ -94,8 +94,12 @@ class MedicalInsuranceSDK:
             
             # 3. 发送请求
             org_config = self.config_manager.get_organization_config(org_code)
+            # 构建完整的接口URL，在base_url后面添加接口编码
+            full_url = f"{org_config.base_url}/{api_code}"
+            logger.info(f"构建的完整URL: {full_url}")
+            logger.info(f"base_url: {org_config.base_url}, api_code: {api_code}")
             response_data = self.http_client.call_medical_api(
-                url=org_config.base_url,
+                url=full_url,
                 request_data=request.to_dict(),
                 headers=headers,
                 timeout=org_config.get_timeout('default')
@@ -104,7 +108,42 @@ class MedicalInsuranceSDK:
             # 4. 解析响应
             response = self.protocol_processor.parse_response(response_data)
             
+            # 4.1. 应用数据解析器进行response_mapping
+            try:
+                from .core.data_parser import DataParser
+                data_parser = DataParser(self.config_manager)
+                parsed_response = data_parser.parse_response_data(api_code, response.to_dict(), org_code)
+                
+                # 如果解析成功且有映射字段，使用解析后的数据
+                if parsed_response and len(parsed_response) > 0:
+                    # 保留原始响应的基础字段，添加解析后的字段
+                    response_dict = response.to_dict()
+                    response_dict.update(parsed_response)
+                    
+                    # 重新构造响应对象
+                    from .models.response import MedicalInsuranceResponse
+                    response = MedicalInsuranceResponse(
+                        infcode=response_dict.get('infcode'),
+                        inf_refmsgid=response_dict.get('inf_refmsgid'),
+                        refmsg_time=response_dict.get('refmsg_time'),
+                        respond_time=response_dict.get('respond_time'),
+                        err_msg=response_dict.get('err_msg'),
+                        output=response_dict.get('output'),
+                        warn_msg=response_dict.get('warn_msg'),
+                        cainfo=response_dict.get('cainfo'),
+                        signtype=response_dict.get('signtype'),
+                        parsed_data=parsed_response  # 添加解析后的数据
+                    )
+                    logger.debug(f"数据解析完成: {api_code}, 解析字段数: {len(parsed_response)}")
+                else:
+                    logger.debug(f"数据解析未产生映射字段: {api_code}")
+                    
+            except Exception as e:
+                logger.warning(f"数据解析失败: {api_code}, 错误: {e}, 使用原始响应")
+            
             # 5. 记录日志
+            # 从kwargs中移除org_code避免重复传递
+            log_kwargs = {k: v for k, v in kwargs.items() if k != 'org_code'}
             self._log_api_call(
                 operation_id=operation_id,
                 api_code=api_code,
@@ -113,7 +152,7 @@ class MedicalInsuranceSDK:
                 response_data=response_data,
                 status='success',
                 duration=time.time() - start_time,
-                **kwargs
+                **log_kwargs
             )
             
             logger.info(f"医保接口调用成功: {api_code}, 耗时: {time.time() - start_time:.3f}秒")
@@ -121,6 +160,8 @@ class MedicalInsuranceSDK:
 
         except ValidationException as e:
             logger.error(f"数据验证失败: {api_code}, 错误: {str(e)}")
+            # 从kwargs中移除org_code避免重复传递
+            log_kwargs = {k: v for k, v in kwargs.items() if k != 'org_code'}
             self._log_api_call(
                 operation_id=operation_id,
                 api_code=api_code,
@@ -130,12 +171,14 @@ class MedicalInsuranceSDK:
                 status='validation_failed',
                 error_message=str(e),
                 duration=time.time() - start_time,
-                **kwargs
+                **log_kwargs
             )
             raise
             
         except NetworkException as e:
             logger.error(f"网络请求失败: {api_code}, 错误: {str(e)}")
+            # 从kwargs中移除org_code避免重复传递
+            log_kwargs = {k: v for k, v in kwargs.items() if k != 'org_code'}
             self._log_api_call(
                 operation_id=operation_id,
                 api_code=api_code,
@@ -145,13 +188,15 @@ class MedicalInsuranceSDK:
                 status='network_failed',
                 error_message=str(e),
                 duration=time.time() - start_time,
-                **kwargs
+                **log_kwargs
             )
             raise
             
         except Exception as e:
             error_msg = f"接口调用失败: {str(e)}"
             logger.error(f"医保接口调用异常: {api_code}, 错误: {error_msg}")
+            # 从kwargs中移除org_code避免重复传递
+            log_kwargs = {k: v for k, v in kwargs.items() if k != 'org_code'}
             self._log_api_call(
                 operation_id=operation_id,
                 api_code=api_code,
@@ -161,7 +206,7 @@ class MedicalInsuranceSDK:
                 status='failed',
                 error_message=error_msg,
                 duration=time.time() - start_time,
-                **kwargs
+                **log_kwargs
             )
             raise MedicalInsuranceException(error_msg) from e
 

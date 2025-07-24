@@ -1,0 +1,424 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "医保接口SDK测试",
+    "description": "医保接口1101和2201的Mock测试接口",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://m1.apifoxmock.com/m1/6809354-6523017-default",
+      "description": "Mock服务器"
+    }
+  ],
+  "paths": {
+    "/fsi/api/rsfComIfsService/callService": {
+      "post": {
+        "summary": "医保接口统一调用",
+        "description": "根据infno字段区分不同的医保接口调用",
+        "tags": ["医保接口"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/Request1101"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Request2201"
+                  }
+                ]
+              },
+              "examples": {
+                "1101_example": {
+                  "summary": "1101人员信息查询示例",
+                  "value": {
+                    "infno": "1101",
+                    "msgid": "test_msg_20240115001",
+                    "mdtrtarea_admvs": "4301",
+                    "insuplc_admdvs": "4301",
+                    "recer_sys_code": "MDY32",
+                    "infver": "V1.0",
+                    "opter_type": "1",
+                    "opter": "test_user",
+                    "opter_name": "测试用户",
+                    "inf_time": "20240115103000",
+                    "fixmedins_code": "TEST001",
+                    "fixmedins_name": "测试医院",
+                    "input": {
+                      "mdtrt_cert_type": "02",
+                      "mdtrt_cert_no": "430123199001011234",
+                      "psn_cert_type": "01",
+                      "certno": "430123199001011234",
+                      "psn_name": "张三"
+                    }
+                  }
+                },
+                "2201_example": {
+                  "summary": "2201门诊结算示例",
+                  "value": {
+                    "infno": "2201",
+                    "msgid": "test_msg_20240115002",
+                    "mdtrtarea_admvs": "4301",
+                    "insuplc_admdvs": "4301",
+                    "recer_sys_code": "MDY32",
+                    "infver": "V1.0",
+                    "opter_type": "1",
+                    "opter": "test_user",
+                    "opter_name": "测试用户",
+                    "inf_time": "20240115103000",
+                    "fixmedins_code": "TEST001",
+                    "fixmedins_name": "测试医院",
+                    "input": {
+                      "mdtrt_id": "MDT20240115001",
+                      "psn_no": "123456789",
+                      "chrg_bchno": "CHG20240115001",
+                      "acct_used_flag": "1",
+                      "insutype": "310"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功响应",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/Response1101"
+                    },
+                    {
+                      "$ref": "#/components/schemas/Response2201"
+                    }
+                  ]
+                },
+                "examples": {
+                  "1101_success": {
+                    "summary": "1101成功响应",
+                    "value": {
+                      "infcode": 0,
+                      "inf_refmsgid": "MSG-1101-001",
+                      "refmsg_time": "2024-01-15 10:30:00",
+                      "respond_time": "2024-01-15 10:30:00",
+                      "err_msg": "",
+                      "output": {
+                        "baseinfo": {
+                          "psn_no": "123456789",
+                          "psn_name": "张三",
+                          "gend": "1",
+                          "brdy": "1990-01-01",
+                          "certno": "430123199001011234",
+                          "tel": "13800138000",
+                          "addr": "湖南省长沙市岳麓区测试街道123号"
+                        },
+                        "insuinfo": [
+                          {
+                            "balc": "5000.00",
+                            "insutype": "310",
+                            "psn_insu_stas": "1"
+                          }
+                        ],
+                        "idetinfo": [
+                          {
+                            "psn_idet_type": "1",
+                            "psn_type_lv": "1",
+                            "begntime": "2023-01-01",
+                            "endtime": "2025-12-31"
+                          }
+                        ]
+                      }
+                    }
+                  },
+                  "2201_success": {
+                    "summary": "2201成功响应",
+                    "value": {
+                      "infcode": 0,
+                      "inf_refmsgid": "MSG-2201-001",
+                      "refmsg_time": "2024-01-15 10:30:00",
+                      "respond_time": "2024-01-15 10:30:00",
+                      "err_msg": "",
+                      "output": {
+                        "setlinfo": {
+                          "setl_id": "SETL20240115001",
+                          "setl_totlnum": "1000.00",
+                          "hifp_pay": "800.00",
+                          "psn_pay": "200.00",
+                          "acct_pay": "100.00",
+                          "psn_cash_pay": "100.00",
+                          "setl_time": "2024-01-15 10:30:00",
+                          "invono": "INV20240115001"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Request1101": {
+        "type": "object",
+        "required": ["infno", "msgid", "input"],
+        "properties": {
+          "infno": {
+            "type": "string",
+            "enum": ["1101"],
+            "description": "接口编号"
+          },
+          "msgid": {
+            "type": "string",
+            "description": "消息ID"
+          },
+          "mdtrtarea_admvs": {
+            "type": "string",
+            "description": "就医地医保区划"
+          },
+          "insuplc_admdvs": {
+            "type": "string",
+            "description": "参保地医保区划"
+          },
+          "recer_sys_code": {
+            "type": "string",
+            "description": "接收方系统代码"
+          },
+          "infver": {
+            "type": "string",
+            "description": "接口版本号"
+          },
+          "opter_type": {
+            "type": "string",
+            "description": "操作员类型"
+          },
+          "opter": {
+            "type": "string",
+            "description": "操作员"
+          },
+          "opter_name": {
+            "type": "string",
+            "description": "操作员姓名"
+          },
+          "inf_time": {
+            "type": "string",
+            "description": "交易时间"
+          },
+          "fixmedins_code": {
+            "type": "string",
+            "description": "定点医药机构编号"
+          },
+          "fixmedins_name": {
+            "type": "string",
+            "description": "定点医药机构名称"
+          },
+          "input": {
+            "type": "object",
+            "required": ["mdtrt_cert_type", "mdtrt_cert_no", "psn_cert_type", "certno", "psn_name"],
+            "properties": {
+              "mdtrt_cert_type": {
+                "type": "string",
+                "enum": ["01", "02", "03"],
+                "description": "就诊凭证类型：01-电子凭证，02-身份证，03-社保卡"
+              },
+              "mdtrt_cert_no": {
+                "type": "string",
+                "description": "就诊凭证编号"
+              },
+              "psn_cert_type": {
+                "type": "string",
+                "enum": ["01"],
+                "description": "人员证件类型：01-身份证"
+              },
+              "certno": {
+                "type": "string",
+                "pattern": "^[0-9]{17}[0-9Xx]$",
+                "description": "证件号码"
+              },
+              "psn_name": {
+                "type": "string",
+                "description": "人员姓名"
+              },
+              "card_sn": {
+                "type": "string",
+                "description": "卡识别码（使用社保卡时必填）"
+              }
+            }
+          }
+        }
+      },
+      "Request2201": {
+        "type": "object",
+        "required": ["infno", "msgid", "input"],
+        "properties": {
+          "infno": {
+            "type": "string",
+            "enum": ["2201"],
+            "description": "接口编号"
+          },
+          "msgid": {
+            "type": "string",
+            "description": "消息ID"
+          },
+          "mdtrtarea_admvs": {
+            "type": "string",
+            "description": "就医地医保区划"
+          },
+          "insuplc_admdvs": {
+            "type": "string",
+            "description": "参保地医保区划"
+          },
+          "recer_sys_code": {
+            "type": "string",
+            "description": "接收方系统代码"
+          },
+          "infver": {
+            "type": "string",
+            "description": "接口版本号"
+          },
+          "opter_type": {
+            "type": "string",
+            "description": "操作员类型"
+          },
+          "opter": {
+            "type": "string",
+            "description": "操作员"
+          },
+          "opter_name": {
+            "type": "string",
+            "description": "操作员姓名"
+          },
+          "inf_time": {
+            "type": "string",
+            "description": "交易时间"
+          },
+          "fixmedins_code": {
+            "type": "string",
+            "description": "定点医药机构编号"
+          },
+          "fixmedins_name": {
+            "type": "string",
+            "description": "定点医药机构名称"
+          },
+          "input": {
+            "type": "object",
+            "required": ["mdtrt_id", "psn_no", "chrg_bchno"],
+            "properties": {
+              "mdtrt_id": {
+                "type": "string",
+                "description": "就医登记号"
+              },
+              "psn_no": {
+                "type": "string",
+                "description": "人员编号"
+              },
+              "chrg_bchno": {
+                "type": "string",
+                "description": "收费批次号"
+              },
+              "acct_used_flag": {
+                "type": "string",
+                "enum": ["0", "1"],
+                "description": "个人账户使用标志：0-不使用，1-使用"
+              },
+              "insutype": {
+                "type": "string",
+                "enum": ["310", "320", "330"],
+                "description": "险种类型"
+              },
+              "invono": {
+                "type": "string",
+                "description": "发票号"
+              }
+            }
+          }
+        }
+      },
+      "Response1101": {
+        "type": "object",
+        "properties": {
+          "infcode": {
+            "type": "integer",
+            "description": "返回码：0-成功，其他-失败"
+          },
+          "inf_refmsgid": {
+            "type": "string",
+            "description": "响应消息ID"
+          },
+          "refmsg_time": {
+            "type": "string",
+            "description": "响应时间"
+          },
+          "respond_time": {
+            "type": "string",
+            "description": "应答时间"
+          },
+          "err_msg": {
+            "type": "string",
+            "description": "错误信息"
+          },
+          "output": {
+            "type": "object",
+            "properties": {
+              "baseinfo": {
+                "type": "object",
+                "description": "人员基本信息"
+              },
+              "insuinfo": {
+                "type": "array",
+                "description": "参保信息"
+              },
+              "idetinfo": {
+                "type": "array",
+                "description": "身份信息"
+              }
+            }
+          }
+        }
+      },
+      "Response2201": {
+        "type": "object",
+        "properties": {
+          "infcode": {
+            "type": "integer",
+            "description": "返回码：0-成功，其他-失败"
+          },
+          "inf_refmsgid": {
+            "type": "string",
+            "description": "响应消息ID"
+          },
+          "refmsg_time": {
+            "type": "string",
+            "description": "响应时间"
+          },
+          "respond_time": {
+            "type": "string",
+            "description": "应答时间"
+          },
+          "err_msg": {
+            "type": "string",
+            "description": "错误信息"
+          },
+          "output": {
+            "type": "object",
+            "properties": {
+              "setlinfo": {
+                "type": "object",
+                "description": "结算信息"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

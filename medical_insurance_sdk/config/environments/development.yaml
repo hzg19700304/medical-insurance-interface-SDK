@@ -1,0 +1,66 @@
+# 开发环境配置
+environment: development
+debug: true
+
+# 数据库配置
+database:
+  host: localhost
+  port: 3306
+  database: medical_insurance_dev
+  username: root
+  password: ""  # 开发环境可以为空
+  charset: utf8mb4
+  pool_size: 5
+  max_overflow: 10
+  pool_timeout: 30
+  pool_recycle: 3600
+
+# Redis配置
+redis:
+  host: localhost
+  port: 6379
+  db: 0
+  password: null
+  max_connections: 10
+  socket_timeout: 5
+  socket_connect_timeout: 5
+
+# 日志配置
+logging:
+  level: DEBUG
+  file_path: logs/medical_insurance_sdk_dev.log
+  max_file_size: 10MB
+  backup_count: 3
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  console_output: true
+
+# 安全配置
+security:
+  encryption_key: null
+  default_crypto_type: SM4
+  default_sign_type: SM3
+  token_expire_minutes: 60
+  max_login_attempts: 5
+
+# HTTP客户端配置
+http:
+  timeout: 30
+  max_retries: 3
+  pool_connections: 10
+  pool_maxsize: 10
+  verify_ssl: false  # 开发环境可以关闭SSL验证
+  user_agent: "MedicalInsuranceSDK/1.0-dev"
+
+# 异步处理配置
+async_processing:
+  celery_broker_url: redis://localhost:6379/1
+  celery_result_backend: redis://localhost:6379/2
+  task_timeout: 300
+  max_retries: 3
+  retry_delay: 60
+
+# 自定义配置
+custom_settings:
+  enable_mock_data: true
+  mock_response_delay: 0.1
+  enable_debug_logging: true

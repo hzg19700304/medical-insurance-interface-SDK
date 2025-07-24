@@ -1,0 +1,69 @@
+# 生产环境配置
+environment: production
+debug: false
+
+# 数据库配置
+database:
+  host: prod-db-host  # 生产环境数据库主机
+  port: 3306
+  database: medical_insurance_prod
+  username: prod_user
+  password: ENCRYPTED_PASSWORD_PLACEHOLDER  # 将被加密存储
+  charset: utf8mb4
+  pool_size: 20
+  max_overflow: 30
+  pool_timeout: 60
+  pool_recycle: 7200
+
+# Redis配置
+redis:
+  host: prod-redis-host  # 生产环境Redis主机
+  port: 6379
+  db: 0
+  password: ENCRYPTED_REDIS_PASSWORD_PLACEHOLDER  # 将被加密存储
+  max_connections: 50
+  socket_timeout: 10
+  socket_connect_timeout: 10
+
+# 日志配置
+logging:
+  level: INFO
+  file_path: /var/log/medical_insurance_sdk/app.log
+  max_file_size: 50MB
+  backup_count: 10
+  format: "%(asctime)s - %(name)s - %(levelname)s - [PROD] %(message)s"
+  console_output: false  # 生产环境不输出到控制台
+
+# 安全配置
+security:
+  encryption_key: null  # 将从环境变量或密钥管理系统获取
+  default_crypto_type: SM4
+  default_sign_type: SM3
+  token_expire_minutes: 120
+  max_login_attempts: 3
+
+# HTTP客户端配置
+http:
+  timeout: 60
+  max_retries: 5
+  pool_connections: 20
+  pool_maxsize: 20
+  verify_ssl: true  # 生产环境必须验证SSL
+  user_agent: "MedicalInsuranceSDK/1.0"
+
+# 异步处理配置
+async_processing:
+  celery_broker_url: redis://prod-redis-host:6379/5
+  celery_result_backend: redis://prod-redis-host:6379/6
+  task_timeout: 600
+  max_retries: 5
+  retry_delay: 120
+
+# 自定义配置
+custom_settings:
+  enable_mock_data: false
+  mock_response_delay: 0
+  enable_debug_logging: false
+  enable_monitoring: true
+  enable_metrics: true
+  health_check_interval: 60

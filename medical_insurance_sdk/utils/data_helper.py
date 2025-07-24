@@ -32,12 +32,16 @@ class DataHelper:
         if not person_info:
             person_info = response_data.get('output', {}).get('baseinfo', {})
         
+        # 如果没有找到嵌套结构，直接从根级别获取
+        if not person_info:
+            person_info = response_data
+        
         return {
             'name': person_info.get('psn_name', person_info.get('person_name', '')),
-            'person_id': person_info.get('psn_no', person_info.get('person_id', '')),
+            'id': person_info.get('psn_no', person_info.get('person_id', '')),
             'id_card': person_info.get('certno', person_info.get('id_card', '')),
-            'gender': DataHelper._format_gender(person_info.get('gend', person_info.get('gender', ''))),
-            'birth_date': DataHelper._format_date(person_info.get('brdy', person_info.get('birth_date', ''))),
+            'gender': person_info.get('gend', person_info.get('gender', '')),
+            'birth_date': person_info.get('brdy', person_info.get('birth_date', '')),
             'age': DataHelper._safe_int(person_info.get('age', 0)),
             'phone': person_info.get('tel', person_info.get('phone', '')),
             'address': person_info.get('addr', person_info.get('address', '')),
@@ -65,10 +69,10 @@ class DataHelper:
         formatted_list = []
         for item in insurance_list:
             formatted_item = {
-                'insurance_type': item.get('insutype', ''),
-                'insurance_type_name': DataHelper._get_insurance_type_name(item.get('insutype', '')),
+                'type': item.get('insutype', item.get('type', '')),
+                'insurance_type_name': DataHelper._get_insurance_type_name(item.get('insutype', item.get('type', ''))),
                 'person_type': item.get('psn_type', ''),
-                'balance': DataHelper._safe_float(item.get('balc', 0)),
+                'balance': DataHelper._safe_float(item.get('balc', item.get('balance', 0))),
                 'status': item.get('psn_insu_stas', ''),
                 'status_name': DataHelper._get_insurance_status_name(item.get('psn_insu_stas', '')),
                 'start_date': DataHelper._format_date(item.get('psn_insu_date', '')),
@@ -149,14 +153,18 @@ class DataHelper:
         if not settlement_info:
             settlement_info = response_data.get('output', {}).get('setlinfo', {})
         
+        # 如果没有找到嵌套结构，直接从根级别获取
+        if not settlement_info:
+            settlement_info = response_data
+        
         return {
             'settlement_id': settlement_info.get('setl_id', settlement_info.get('settlement_id', '')),
-            'total_amount': DataHelper._safe_float(settlement_info.get('setl_totlnum', settlement_info.get('total_amount', 0))),
-            'insurance_amount': DataHelper._safe_float(settlement_info.get('hifp_pay', settlement_info.get('insurance_amount', 0))),
-            'personal_amount': DataHelper._safe_float(settlement_info.get('psn_pay', settlement_info.get('personal_amount', 0))),
+            'total': DataHelper._safe_float(settlement_info.get('setl_totlnum', settlement_info.get('total_amount', 0))),
+            'insurance_pay': DataHelper._safe_float(settlement_info.get('hifp_pay', settlement_info.get('insurance_amount', 0))),
+            'personal_pay': DataHelper._safe_float(settlement_info.get('psn_pay', settlement_info.get('personal_amount', 0))),
             'account_amount': DataHelper._safe_float(settlement_info.get('acct_pay', 0)),
             'cash_amount': DataHelper._safe_float(settlement_info.get('psn_cash_pay', 0)),
-            'settlement_time': DataHelper._format_datetime(settlement_info.get('setl_time', settlement_info.get('settlement_time', ''))),
+            'settlement_time': settlement_info.get('setl_time', settlement_info.get('settlement_time', '')),
             'medical_type': settlement_info.get('med_type', ''),
             'settlement_type': settlement_info.get('setl_type', ''),
             'invoice_no': settlement_info.get('invono', ''),
@@ -877,6 +885,39 @@ class DataHelper:
             '390': '其他医疗保险'
         }
         return type_map.get(str(insurance_type).strip(), str(insurance_type))
+    
+    @staticmethod
+    def _validate_id_card_checksum(id_card: str) -> bool:
+        """验证18位身份证校验码
+        
+        Args:
+            id_card: 18位身份证号码
+            
+        Returns:
+            bool: 校验码是否正确
+        """
+        if len(id_card) != 18:
+            return False
+        
+        # 权重因子
+        weights = [7, 9, 10, 5, 8, 4, 2, 1, 6, 3, 7, 9, 10, 5, 8, 4, 2]
+        # 校验码对应表
+        check_codes = ['1', '0', 'X', '9', '8', '7', '6', '5', '4', '3', '2']
+        
+        try:
+            # 计算前17位的加权和
+            sum_value = 0
+            for i in range(17):
+                sum_value += int(id_card[i]) * weights[i]
+            
+            # 计算校验码
+            remainder = sum_value % 11
+            expected_check_code = check_codes[remainder]
+            
+            # 比较校验码（不区分大小写）
+            return id_card[17].upper() == expected_check_code.upper()
+        except (ValueError, IndexError):
+            return False
     
     @staticmethod
     def _get_insurance_status_name(status_code: str) -> str:

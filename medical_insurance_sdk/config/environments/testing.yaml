@@ -1,0 +1,48 @@
+async_processing:
+  celery_broker_url: redis://localhost:6379/1
+  celery_result_backend: redis://localhost:6379/2
+  max_retries: 3
+  retry_delay: 60
+  task_timeout: 300
+custom_settings: {}
+database:
+  charset: utf8mb4
+  database: medical_insurance_test
+  host: localhost
+  max_overflow: 20
+  password: ENCRYPTED_Z0FBQUFBQm9mdU9qZHFFUjdzek84OEJ4U2JmX1ZBYkprV3ZwNllkYmtXRXVBRS1aVW1jbG9CLXFHbVBKUk91a1NoVU9lX1RUNEJpMzFEcF9GNnBNZmlaX3NLTE85UjBBTmc9PQ==
+  pool_recycle: 3600
+  pool_size: 10
+  pool_timeout: 30
+  port: 3306
+  username: test_user
+debug: true
+environment: testing
+http:
+  max_retries: 3
+  pool_connections: 10
+  pool_maxsize: 10
+  timeout: 30
+  user_agent: MedicalInsuranceSDK/1.0
+  verify_ssl: true
+logging:
+  backup_count: 5
+  console_output: true
+  file_path: logs/test.log
+  format: '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+  level: DEBUG
+  max_file_size: 10MB
+redis:
+  db: 1
+  host: localhost
+  max_connections: 10
+  password: null
+  port: 6379
+  socket_connect_timeout: 5
+  socket_timeout: 5
+security:
+  default_crypto_type: SM4
+  default_sign_type: SM3
+  encryption_key: null
+  max_login_attempts: 5
+  token_expire_minutes: 30
