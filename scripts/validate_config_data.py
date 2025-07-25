@@ -1,406 +1,461 @@
 #!/usr/bin/env python3
 """
 医保接口SDK配置数据验证脚本
-用于验证任务2.1和2.2的完成情况
-
-功能：
-1. 验证数据库表结构是否正确创建
-2. 验证1101接口配置数据是否完整
-3. 验证2201接口配置数据是否完整
-4. 验证测试机构配置数据是否正确
+验证数据库中的配置数据完整性和正确性
 """
 
-import os
 import sys
-import sqlite3
 import json
-from pathlib import Path
+import logging
+import argparse
+from typing import Dict, List, Any, Tuple
 
-def connect_to_test_database():
-    """连接到测试数据库"""
-    db_path = Path(__file__).parent.parent / 'test_database.db'
-    if not db_path.exists():
-        print("✗ 测试数据库不存在，请先运行: python scripts/setup_test_database.py")
-        return None
-    
-    try:
-        conn = sqlite3.connect(str(db_path))
-        conn.row_factory = sqlite3.Row  # 使结果可以按列名访问
-        print(f"✓ 成功连接到测试数据库: {db_path}")
-        return conn
-    except Exception as e:
-        print(f"✗ 连接测试数据库失败: {e}")
-        return None
+import pymysql
+from pymysql.cursors import DictCursor
 
-def validate_table_structure(conn):
-    """验证表结构"""
-    print("\n" + "="*50)
-    print("验证数据库表结构")
-    print("="*50)
-    
-    cursor = conn.cursor()
-    
-    # 检查必需的表是否存在
-    required_tables = [
-        'medical_interface_config',
-        'medical_organization_config', 
-        'business_operation_logs',
-        'medical_institution_info'
-    ]
-    
-    cursor.execute("SELECT name FROM sqlite_master WHERE type='table'")
-    existing_tables = [row[0] for row in cursor.fetchall()]
-    
-    print(f"数据库中的表: {existing_tables}")
-    
-    all_tables_exist = True
-    for table in required_tables:
-        if table in existing_tables:
-            print(f"✓ {table} - 存在")
-        else:
-            print(f"✗ {table} - 不存在")
-            all_tables_exist = False
-    
-    if all_tables_exist:
-        print("✓ 所有必需的表都已创建")
-        return True
-    else:
-        print("✗ 部分必需的表缺失")
-        return False
 
-def validate_interface_1101_config(conn):
-    """验证1101接口配置"""
-    print("\n" + "="*50)
-    print("验证1101接口配置（人员基本信息获取）")
-    print("="*50)
+class ConfigValidator:
+    """配置验证器"""
     
-    cursor = conn.cursor()
-    cursor.execute("""
-        SELECT api_code, api_name, business_category, business_type,
-               required_params, validation_rules, response_mapping
-        FROM medical_interface_config 
-        WHERE api_code = '1101'
-    """)
-    
-    result = cursor.fetchone()
-    if not result:
-        print("✗ 未找到1101接口配置")
-        return False
-    
-    print(f"✓ 接口编码: {result['api_code']}")
-    print(f"✓ 接口名称: {result['api_name']}")
-    print(f"✓ 业务分类: {result['business_category']}")
-    print(f"✓ 业务类型: {result['business_type']}")
-    
-    # 验证必填参数配置
-    try:
-        required_params = json.loads(result['required_params'])
-        expected_params = ['mdtrt_cert_type', 'mdtrt_cert_no', 'psn_cert_type', 'certno', 'psn_name']
+    def __init__(self, host: str, port: int, user: str, password: str, database: str):
+        self.host = host
+        self.port = port
+        self.user = user
+        self.password = password
+        self.database = database
+        self.connection = None
         
-        print(f"\n必填参数配置验证:")
-        missing_params = []
-        for param in expected_params:
-            if param in required_params:
-                print(f"  ✓ {param}: {required_params[param].get('display_name', 'N/A')}")
+        # 设置日志
+        logging.basicConfig(
+            level=logging.INFO,
+            format='%(asctime)s - %(levelname)s - %(message)s'
+        )
+        self.logger = logging.getLogger(__name__)
+    
+    def connect(self):
+        """连接数据库"""
+        try:
+            self.connection = pymysql.connect(
+                host=self.host,
+                port=self.port,
+                user=self.user,
+                password=self.password,
+                database=self.database,
+                charset='utf8mb4',
+                cursorclass=DictCursor
+            )
+            self.logger.info(f"成功连接到数据库 {self.host}:{self.port}/{self.database}")
+        except Exception as e:
+            self.logger.error(f"数据库连接失败: {e}")
+            raise
+    
+    def disconnect(self):
+        """断开数据库连接"""
+        if self.connection:
+            self.connection.close()
+            self.logger.info("数据库连接已关闭")
+    
+    def validate_interface_config(self) -> Tuple[bool, List[str]]:
+        """验证接口配置"""
+        errors = []
+        
+        try:
+            with self.connection.cursor() as cursor:
+                # 检查接口配置表是否存在
+                cursor.execute("""
+                    SELECT COUNT(*) as count 
+                    FROM information_schema.tables 
+                    WHERE table_schema = %s AND table_name = 'medical_interface_config'
+                """, (self.database,))
+                
+                if cursor.fetchone()['count'] == 0:
+                    errors.append("接口配置表 medical_interface_config 不存在")
+                    return False, errors
+                
+                # 检查配置数据
+                cursor.execute("SELECT * FROM medical_interface_config WHERE is_active = 1")
+                configs = cursor.fetchall()
+                
+                if not configs:
+                    errors.append("没有找到活跃的接口配置")
+                    return False, errors
+                
+                # 验证每个配置
+                for config in configs:
+                    config_errors = self._validate_single_interface_config(config)
+                    errors.extend(config_errors)
+                
+                self.logger.info(f"验证了 {len(configs)} 个接口配置")
+                
+        except Exception as e:
+            errors.append(f"验证接口配置时发生错误: {str(e)}")
+        
+        return len(errors) == 0, errors
+    
+    def _validate_single_interface_config(self, config: Dict) -> List[str]:
+        """验证单个接口配置"""
+        errors = []
+        api_code = config.get('api_code', 'unknown')
+        
+        # 检查必填字段
+        required_fields = ['api_code', 'api_name', 'business_category', 'business_type']
+        for field in required_fields:
+            if not config.get(field):
+                errors.append(f"接口 {api_code}: 缺少必填字段 {field}")
+        
+        # 验证JSON字段
+        json_fields = ['required_params', 'optional_params', 'default_values', 
+                      'request_template', 'response_mapping', 'validation_rules']
+        
+        for field in json_fields:
+            if config.get(field):
+                try:
+                    json.loads(config[field])
+                except json.JSONDecodeError as e:
+                    errors.append(f"接口 {api_code}: {field} JSON格式错误 - {str(e)}")
+        
+        # 验证业务分类
+        valid_categories = [
+            '基础信息业务', '医保服务业务', '机构管理业务', '信息采集业务',
+            '信息查询业务', '线上支付业务', '电子处方业务', '场景监控业务',
+            '其他业务', '电子票据业务'
+        ]
+        
+        if config.get('business_category') not in valid_categories:
+            errors.append(f"接口 {api_code}: 无效的业务分类 {config.get('business_category')}")
+        
+        # 验证超时和重试配置
+        timeout = config.get('timeout_seconds', 0)
+        if timeout <= 0 or timeout > 300:
+            errors.append(f"接口 {api_code}: 超时时间配置异常 {timeout}")
+        
+        retry_times = config.get('max_retry_times', 0)
+        if retry_times < 0 or retry_times > 10:
+            errors.append(f"接口 {api_code}: 重试次数配置异常 {retry_times}")
+        
+        return errors
+    
+    def validate_organization_config(self) -> Tuple[bool, List[str]]:
+        """验证机构配置"""
+        errors = []
+        
+        try:
+            with self.connection.cursor() as cursor:
+                # 检查机构配置表是否存在
+                cursor.execute("""
+                    SELECT COUNT(*) as count 
+                    FROM information_schema.tables 
+                    WHERE table_schema = %s AND table_name = 'medical_organization_config'
+                """, (self.database,))
+                
+                if cursor.fetchone()['count'] == 0:
+                    errors.append("机构配置表 medical_organization_config 不存在")
+                    return False, errors
+                
+                # 检查配置数据
+                cursor.execute("SELECT * FROM medical_organization_config WHERE is_active = 1")
+                configs = cursor.fetchall()
+                
+                if not configs:
+                    errors.append("没有找到活跃的机构配置")
+                    return False, errors
+                
+                # 验证每个配置
+                for config in configs:
+                    config_errors = self._validate_single_organization_config(config)
+                    errors.extend(config_errors)
+                
+                self.logger.info(f"验证了 {len(configs)} 个机构配置")
+                
+        except Exception as e:
+            errors.append(f"验证机构配置时发生错误: {str(e)}")
+        
+        return len(errors) == 0, errors
+    
+    def _validate_single_organization_config(self, config: Dict) -> List[str]:
+        """验证单个机构配置"""
+        errors = []
+        org_code = config.get('org_code', 'unknown')
+        
+        # 检查必填字段
+        required_fields = ['org_code', 'org_name', 'app_id', 'app_secret', 'base_url']
+        for field in required_fields:
+            if not config.get(field):
+                errors.append(f"机构 {org_code}: 缺少必填字段 {field}")
+        
+        # 验证URL格式
+        base_url = config.get('base_url', '')
+        if base_url and not (base_url.startswith('http://') or base_url.startswith('https://')):
+            errors.append(f"机构 {org_code}: base_url格式错误 {base_url}")
+        
+        # 验证加密类型
+        valid_crypto_types = ['SM4', 'AES', 'DES']
+        crypto_type = config.get('crypto_type', '')
+        if crypto_type and crypto_type not in valid_crypto_types:
+            errors.append(f"机构 {org_code}: 无效的加密类型 {crypto_type}")
+        
+        # 验证签名类型
+        valid_sign_types = ['SM3', 'SHA1', 'SHA256', 'MD5']
+        sign_type = config.get('sign_type', '')
+        if sign_type and sign_type not in valid_sign_types:
+            errors.append(f"机构 {org_code}: 无效的签名类型 {sign_type}")
+        
+        # 验证JSON字段
+        json_fields = ['timeout_config', 'region_specific']
+        for field in json_fields:
+            if config.get(field):
+                try:
+                    json.loads(config[field])
+                except json.JSONDecodeError as e:
+                    errors.append(f"机构 {org_code}: {field} JSON格式错误 - {str(e)}")
+        
+        return errors
+    
+    def validate_database_structure(self) -> Tuple[bool, List[str]]:
+        """验证数据库结构"""
+        errors = []
+        
+        try:
+            with self.connection.cursor() as cursor:
+                # 检查必要的表
+                required_tables = [
+                    'medical_interface_config',
+                    'medical_organization_config',
+                    'business_operation_logs',
+                    'medical_institution_info',
+                    'medical_interface_stats'
+                ]
+                
+                for table in required_tables:
+                    cursor.execute("""
+                        SELECT COUNT(*) as count 
+                        FROM information_schema.tables 
+                        WHERE table_schema = %s AND table_name = %s
+                    """, (self.database, table))
+                    
+                    if cursor.fetchone()['count'] == 0:
+                        errors.append(f"缺少必要的表: {table}")
+                
+                # 检查索引
+                cursor.execute("""
+                    SELECT table_name, index_name, column_name
+                    FROM information_schema.statistics 
+                    WHERE table_schema = %s AND index_name != 'PRIMARY'
+                    ORDER BY table_name, index_name
+                """, (self.database,))
+                
+                indexes = cursor.fetchall()
+                self.logger.info(f"找到 {len(indexes)} 个索引")
+                
+                # 检查约束
+                cursor.execute("""
+                    SELECT table_name, constraint_name, constraint_type
+                    FROM information_schema.table_constraints 
+                    WHERE table_schema = %s
+                    ORDER BY table_name, constraint_type
+                """, (self.database,))
+                
+                constraints = cursor.fetchall()
+                self.logger.info(f"找到 {len(constraints)} 个约束")
+                
+        except Exception as e:
+            errors.append(f"验证数据库结构时发生错误: {str(e)}")
+        
+        return len(errors) == 0, errors
+    
+    def validate_data_consistency(self) -> Tuple[bool, List[str]]:
+        """验证数据一致性"""
+        errors = []
+        
+        try:
+            with self.connection.cursor() as cursor:
+                # 检查接口配置和机构配置的关联性
+                cursor.execute("""
+                    SELECT DISTINCT api_code 
+                    FROM business_operation_logs 
+                    WHERE api_code NOT IN (
+                        SELECT api_code FROM medical_interface_config WHERE is_active = 1
+                    )
+                    LIMIT 10
+                """)
+                
+                missing_configs = cursor.fetchall()
+                for config in missing_configs:
+                    errors.append(f"操作日志中存在未配置的接口: {config['api_code']}")
+                
+                # 检查机构配置的完整性
+                cursor.execute("""
+                    SELECT DISTINCT institution_code 
+                    FROM business_operation_logs 
+                    WHERE institution_code NOT IN (
+                        SELECT org_code FROM medical_organization_config WHERE is_active = 1
+                    )
+                    LIMIT 10
+                """)
+                
+                missing_orgs = cursor.fetchall()
+                for org in missing_orgs:
+                    errors.append(f"操作日志中存在未配置的机构: {org['institution_code']}")
+                
+                # 检查数据完整性
+                cursor.execute("""
+                    SELECT COUNT(*) as count 
+                    FROM business_operation_logs 
+                    WHERE request_data IS NULL OR response_data IS NULL
+                """)
+                
+                incomplete_logs = cursor.fetchone()['count']
+                if incomplete_logs > 0:
+                    errors.append(f"存在 {incomplete_logs} 条不完整的操作日志")
+                
+        except Exception as e:
+            errors.append(f"验证数据一致性时发生错误: {str(e)}")
+        
+        return len(errors) == 0, errors
+    
+    def generate_report(self) -> Dict[str, Any]:
+        """生成验证报告"""
+        report = {
+            'timestamp': str(sys.modules['datetime'].datetime.now()),
+            'database': f"{self.host}:{self.port}/{self.database}",
+            'results': {},
+            'summary': {
+                'total_checks': 0,
+                'passed_checks': 0,
+                'failed_checks': 0,
+                'total_errors': 0
+            }
+        }
+        
+        # 执行各项验证
+        checks = [
+            ('database_structure', self.validate_database_structure),
+            ('interface_config', self.validate_interface_config),
+            ('organization_config', self.validate_organization_config),
+            ('data_consistency', self.validate_data_consistency)
+        ]
+        
+        for check_name, check_func in checks:
+            self.logger.info(f"执行检查: {check_name}")
+            
+            try:
+                success, errors = check_func()
+                report['results'][check_name] = {
+                    'passed': success,
+                    'errors': errors,
+                    'error_count': len(errors)
+                }
+                
+                report['summary']['total_checks'] += 1
+                if success:
+                    report['summary']['passed_checks'] += 1
+                else:
+                    report['summary']['failed_checks'] += 1
+                report['summary']['total_errors'] += len(errors)
+                
+            except Exception as e:
+                self.logger.error(f"检查 {check_name} 时发生异常: {e}")
+                report['results'][check_name] = {
+                    'passed': False,
+                    'errors': [f"检查异常: {str(e)}"],
+                    'error_count': 1
+                }
+                report['summary']['total_checks'] += 1
+                report['summary']['failed_checks'] += 1
+                report['summary']['total_errors'] += 1
+        
+        return report
+    
+    def validate_all(self) -> bool:
+        """执行完整验证"""
+        self.logger.info("开始配置数据验证...")
+        
+        self.connect()
+        
+        try:
+            report = self.generate_report()
+            
+            # 输出报告
+            print("\n" + "="*60)
+            print("医保接口SDK配置验证报告")
+            print("="*60)
+            print(f"数据库: {report['database']}")
+            print(f"验证时间: {report['timestamp']}")
+            print()
+            
+            # 输出摘要
+            summary = report['summary']
+            print("验证摘要:")
+            print(f"  总检查项: {summary['total_checks']}")
+            print(f"  通过检查: {summary['passed_checks']}")
+            print(f"  失败检查: {summary['failed_checks']}")
+            print(f"  总错误数: {summary['total_errors']}")
+            print()
+            
+            # 输出详细结果
+            for check_name, result in report['results'].items():
+                status = "✓ 通过" if result['passed'] else "✗ 失败"
+                print(f"{check_name}: {status}")
+                
+                if result['errors']:
+                    for error in result['errors']:
+                        print(f"  - {error}")
+                print()
+            
+            # 总体结果
+            overall_success = summary['failed_checks'] == 0
+            if overall_success:
+                print("✓ 配置验证通过！")
             else:
-                print(f"  ✗ {param}: 缺失")
-                missing_params.append(param)
-        
-        if missing_params:
-            print(f"✗ 缺少必填参数: {missing_params}")
-            return False
-        else:
-            print("✓ 所有必填参数配置完整")
-    
-    except json.JSONDecodeError as e:
-        print(f"✗ 必填参数JSON格式错误: {e}")
-        return False
-    
-    # 验证验证规则
-    try:
-        validation_rules = json.loads(result['validation_rules'])
-        if 'certno' in validation_rules:
-            certno_rule = validation_rules['certno']
-            if 'pattern' in certno_rule:
-                print(f"✓ 身份证验证规则: {certno_rule['pattern']}")
-            else:
-                print("✗ 身份证验证规则缺少pattern")
-                return False
-        else:
-            print("✗ 缺少身份证验证规则")
-            return False
-    
-    except json.JSONDecodeError as e:
-        print(f"✗ 验证规则JSON格式错误: {e}")
-        return False
-    
-    # 验证响应映射
-    try:
-        response_mapping = json.loads(result['response_mapping'])
-        expected_mappings = ['person_name', 'person_id']
-        
-        print(f"\n响应映射配置验证:")
-        for mapping in expected_mappings:
-            if mapping in response_mapping:
-                print(f"  ✓ {mapping}: {response_mapping[mapping]}")
-            else:
-                print(f"  ✗ {mapping}: 缺失")
-                return False
-        
-        print("✓ 响应映射配置完整")
-    
-    except json.JSONDecodeError as e:
-        print(f"✗ 响应映射JSON格式错误: {e}")
-        return False
-    
-    print("✓ 1101接口配置验证通过")
-    return True
+                print("✗ 配置验证失败，请修复上述错误")
+            
+            return overall_success
+            
+        finally:
+            self.disconnect()
 
-def validate_interface_2201_config(conn):
-    """验证2201接口配置"""
-    print("\n" + "="*50)
-    print("验证2201接口配置（门诊结算）")
-    print("="*50)
-    
-    cursor = conn.cursor()
-    cursor.execute("""
-        SELECT api_code, api_name, business_category, business_type,
-               required_params, default_values, response_mapping
-        FROM medical_interface_config 
-        WHERE api_code = '2201'
-    """)
-    
-    result = cursor.fetchone()
-    if not result:
-        print("✗ 未找到2201接口配置")
-        return False
-    
-    print(f"✓ 接口编码: {result['api_code']}")
-    print(f"✓ 接口名称: {result['api_name']}")
-    print(f"✓ 业务分类: {result['business_category']}")
-    print(f"✓ 业务类型: {result['business_type']}")
-    
-    # 验证必填参数配置
-    try:
-        required_params = json.loads(result['required_params'])
-        expected_params = ['mdtrt_id', 'psn_no', 'chrg_bchno']
-        
-        print(f"\n必填参数配置验证:")
-        missing_params = []
-        for param in expected_params:
-            if param in required_params:
-                print(f"  ✓ {param}: {required_params[param].get('display_name', 'N/A')}")
-            else:
-                print(f"  ✗ {param}: 缺失")
-                missing_params.append(param)
-        
-        if missing_params:
-            print(f"✗ 缺少必填参数: {missing_params}")
-            return False
-        else:
-            print("✓ 所有必填参数配置完整")
-    
-    except json.JSONDecodeError as e:
-        print(f"✗ 必填参数JSON格式错误: {e}")
-        return False
-    
-    # 验证默认值配置
-    try:
-        default_values = json.loads(result['default_values'])
-        expected_defaults = ['acct_used_flag', 'insutype']
-        
-        print(f"\n默认值配置验证:")
-        for default_key in expected_defaults:
-            if default_key in default_values:
-                print(f"  ✓ {default_key}: {default_values[default_key]}")
-            else:
-                print(f"  ✗ {default_key}: 缺失")
-                return False
-        
-        print("✓ 默认值配置完整")
-    
-    except json.JSONDecodeError as e:
-        print(f"✗ 默认值JSON格式错误: {e}")
-        return False
-    
-    # 验证响应映射
-    try:
-        response_mapping = json.loads(result['response_mapping'])
-        expected_mappings = ['settlement_id', 'total_amount']
-        
-        print(f"\n响应映射配置验证:")
-        for mapping in expected_mappings:
-            if mapping in response_mapping:
-                print(f"  ✓ {mapping}: {response_mapping[mapping]}")
-            else:
-                print(f"  ✗ {mapping}: 缺失")
-                return False
-        
-        print("✓ 响应映射配置完整")
-    
-    except json.JSONDecodeError as e:
-        print(f"✗ 响应映射JSON格式错误: {e}")
-        return False
-    
-    print("✓ 2201接口配置验证通过")
-    return True
-
-def validate_organization_config(conn):
-    """验证机构配置"""
-    print("\n" + "="*50)
-    print("验证测试机构配置")
-    print("="*50)
-    
-    cursor = conn.cursor()
-    cursor.execute("""
-        SELECT org_code, org_name, org_type, province_code, city_code,
-               app_id, app_secret, base_url, is_test_env
-        FROM medical_organization_config 
-        WHERE org_code = 'TEST001'
-    """)
-    
-    result = cursor.fetchone()
-    if not result:
-        print("✗ 未找到测试机构配置")
-        return False
-    
-    print(f"✓ 机构编码: {result['org_code']}")
-    print(f"✓ 机构名称: {result['org_name']}")
-    print(f"✓ 机构类型: {result['org_type']}")
-    print(f"✓ 省份代码: {result['province_code']}")
-    print(f"✓ 城市代码: {result['city_code']}")
-    print(f"✓ 应用ID: {result['app_id']}")
-    print(f"✓ 基础URL: {result['base_url']}")
-    print(f"✓ 测试环境: {'是' if result['is_test_env'] else '否'}")
-    
-    # 验证必需字段
-    required_fields = {
-        'org_code': result['org_code'],
-        'org_name': result['org_name'],
-        'app_id': result['app_id'],
-        'app_secret': result['app_secret'],
-        'base_url': result['base_url']
-    }
-    
-    missing_fields = []
-    for field, value in required_fields.items():
-        if not value:
-            missing_fields.append(field)
-    
-    if missing_fields:
-        print(f"✗ 缺少必需字段: {missing_fields}")
-        return False
-    
-    print("✓ 测试机构配置验证通过")
-    return True
-
-def validate_institution_info(conn):
-    """验证机构信息"""
-    print("\n" + "="*50)
-    print("验证机构信息数据")
-    print("="*50)
-    
-    cursor = conn.cursor()
-    cursor.execute("""
-        SELECT fixmedins_code, fixmedins_name, uscc, fixmedins_type, hosp_lv
-        FROM medical_institution_info 
-        WHERE fixmedins_code = 'TEST00000001'
-    """)
-    
-    result = cursor.fetchone()
-    if not result:
-        print("✗ 未找到机构信息数据")
-        return False
-    
-    print(f"✓ 机构编号: {result['fixmedins_code']}")
-    print(f"✓ 机构名称: {result['fixmedins_name']}")
-    print(f"✓ 信用代码: {result['uscc']}")
-    print(f"✓ 机构类型: {result['fixmedins_type']}")
-    print(f"✓ 医院等级: {result['hosp_lv']}")
-    
-    print("✓ 机构信息数据验证通过")
-    return True
-
-def generate_validation_report(results):
-    """生成验证报告"""
-    print("\n" + "="*60)
-    print("任务2数据库设计和初始化 - 验证报告")
-    print("="*60)
-    
-    print("\n任务2.1 - 创建MySQL数据库表结构:")
-    if results['table_structure']:
-        print("  ✓ 数据库表结构创建成功")
-        print("    - medical_interface_config表（接口配置）")
-        print("    - medical_organization_config表（机构配置）")
-        print("    - business_operation_logs表（操作日志）")
-        print("    - medical_institution_info表（机构信息）")
-        print("    - 创建了必要的索引和约束")
-    else:
-        print("  ✗ 数据库表结构创建失败")
-    
-    print("\n任务2.2 - 初始化配置数据:")
-    if results['interface_1101'] and results['interface_2201'] and results['organization']:
-        print("  ✓ 配置数据初始化成功")
-        if results['interface_1101']:
-            print("    - ✓ 人员信息获取接口(1101)的完整配置")
-        if results['interface_2201']:
-            print("    - ✓ 门诊结算接口(2201)的配置数据")
-        if results['organization']:
-            print("    - ✓ 测试机构的配置数据")
-        if results['institution_info']:
-            print("    - ✓ 机构信息数据")
-    else:
-        print("  ✗ 配置数据初始化失败")
-        if not results['interface_1101']:
-            print("    - ✗ 人员信息获取接口(1101)配置缺失或不完整")
-        if not results['interface_2201']:
-            print("    - ✗ 门诊结算接口(2201)配置缺失或不完整")
-        if not results['organization']:
-            print("    - ✗ 测试机构配置缺失或不完整")
-    
-    # 总体结果
-    all_passed = all(results.values())
-    print(f"\n总体结果: {'✓ 通过' if all_passed else '✗ 失败'}")
-    
-    if all_passed:
-        print("\n🎉 任务2完成情况:")
-        print("- ✅ 任务2.1: 创建MySQL数据库表结构 - 已完成")
-        print("- ✅ 任务2.2: 初始化配置数据 - 已完成")
-        print("\n✅ 任务2: 数据库设计和初始化 - 全部完成")
-    else:
-        print("\n❌ 任务2存在问题，需要修复")
-    
-    return all_passed
 
 def main():
     """主函数"""
-    print("医保接口SDK配置数据验证")
-    print("验证任务2.1和2.2的完成情况")
-    print()
+    parser = argparse.ArgumentParser(description='医保接口SDK配置数据验证')
+    parser.add_argument('--host', default='localhost', help='数据库主机')
+    parser.add_argument('--port', type=int, default=3306, help='数据库端口')
+    parser.add_argument('--user', default='root', help='数据库用户')
+    parser.add_argument('--password', required=True, help='数据库密码')
+    parser.add_argument('--database', default='medical_insurance_sdk', help='数据库名')
+    parser.add_argument('--json', action='store_true', help='输出JSON格式报告')
     
-    # 连接数据库
-    conn = connect_to_test_database()
-    if not conn:
-        return False
+    args = parser.parse_args()
     
     try:
-        # 执行各项验证
-        results = {
-            'table_structure': validate_table_structure(conn),
-            'interface_1101': validate_interface_1101_config(conn),
-            'interface_2201': validate_interface_2201_config(conn),
-            'organization': validate_organization_config(conn),
-            'institution_info': validate_institution_info(conn)
-        }
+        validator = ConfigValidator(
+            host=args.host,
+            port=args.port,
+            user=args.user,
+            password=args.password,
+            database=args.database
+        )
         
-        # 生成验证报告
-        success = generate_validation_report(results)
+        if args.json:
+            # JSON格式输出
+            validator.connect()
+            try:
+                report = validator.generate_report()
+                print(json.dumps(report, ensure_ascii=False, indent=2))
+            finally:
+                validator.disconnect()
+        else:
+            # 标准格式输出
+            success = validator.validate_all()
+            sys.exit(0 if success else 1)
         
-        return success
-        
-    finally:
-        conn.close()
+    except KeyboardInterrupt:
+        print("\n验证被用户中断")
+        sys.exit(1)
+    except Exception as e:
+        print(f"验证失败: {e}")
+        sys.exit(1)
 
-if __name__ == "__main__":
-    success = main()
-    sys.exit(0 if success else 1)
+
+if __name__ == '__main__':
+    main()

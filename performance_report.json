@@ -1,0 +1,643 @@
+{
+  "overview_timestamp": "2025-07-25T09:32:11.575525",
+  "time_range_minutes": 60,
+  "overall_stats": {
+    "total_calls": 85,
+    "successful_calls": 78,
+    "failed_calls": 7,
+    "success_rate": 91.76470588235294,
+    "average_response_time": 342.516294117647,
+    "api_breakdown": {
+      "1201": {
+        "count": 6,
+        "success": 6,
+        "avg_time": 508.9736666666666,
+        "success_rate": 100.0
+      },
+      "1101": {
+        "count": 26,
+        "success": 23,
+        "avg_time": 183.7948076923077,
+        "success_rate": 88.46153846153845
+      },
+      "1301": {
+        "count": 8,
+        "success": 8,
+        "avg_time": 487.56899999999996,
+        "success_rate": 100.0
+      },
+      "2207": {
+        "count": 6,
+        "success": 5,
+        "avg_time": 1277.8701666666666,
+        "success_rate": 83.33333333333334
+      },
+      "2201": {
+        "count": 4,
+        "success": 4,
+        "avg_time": 1199.25925,
+        "success_rate": 100.0
+      },
+      "1100": {
+        "count": 20,
+        "success": 19,
+        "avg_time": 125.58395000000003,
+        "success_rate": 95.0
+      },
+      "1102": {
+        "count": 10,
+        "success": 8,
+        "avg_time": 144.3867,
+        "success_rate": 80.0
+      },
+      "demo_api": {
+        "count": 5,
+        "success": 5,
+        "avg_time": 192.2044,
+        "success_rate": 100.0
+      }
+    },
+    "error_breakdown": {
+      "NetworkException": 1,
+      "ConcurrentTestError": 6
+    },
+    "time_range_minutes": 60,
+    "timestamp": "2025-07-25T09:32:11.567911"
+  },
+  "system_metrics": {
+    "process": {
+      "pid": 18452,
+      "memory_rss": 62529536,
+      "memory_vms": 44924928,
+      "memory_percent": 0.370670912895492,
+      "cpu_percent": 0.0,
+      "num_threads": 8,
+      "create_time": "2025-07-25T09:31:43.402215"
+    },
+    "system": {
+      "memory_total": 16869285888,
+      "memory_available": 4647612416,
+      "memory_percent": 72.4,
+      "cpu_count": 24,
+      "disk_total": 398457827328,
+      "disk_used": 110867861504,
+      "disk_free": 287589965824,
+      "disk_percent": 27.824239831719126
+    },
+    "timestamp": "2025-07-25T09:32:11.575469"
+  },
+  "api_performance": {
+    "1201": {
+      "api_code": "1201",
+      "time_range_minutes": 60,
+      "analysis_timestamp": "2025-07-25T09:32:11.556411",
+      "basic_stats": {
+        "total_calls": 6,
+        "successful_calls": 6,
+        "failed_calls": 0,
+        "success_rate": 1.0,
+        "error_rate": 0.0
+      },
+      "response_time_stats": {
+        "count": 6,
+        "mean": 508.97366666666665,
+        "median": 487.0795,
+        "min": 272.823,
+        "max": 727.2539999999999,
+        "std_dev": 163.8578037173288,
+        "p95": 727.2539999999999,
+        "p99": 727.2539999999999
+      },
+      "error_analysis": {
+        "total_errors": 0,
+        "error_types": {},
+        "error_rate_by_org": {},
+        "most_common_errors": []
+      },
+      "time_series_analysis": {
+        "interval_minutes": 5,
+        "time_series": [
+          {
+            "timestamp": "2025-07-25T09:31:45.949482",
+            "calls": 6,
+            "errors": 0,
+            "error_rate": 0.0,
+            "avg_response_time": 508.9736666666666
+          }
+        ],
+        "call_trend": null,
+        "response_time_trend": null,
+        "status": "analyzed"
+      },
+      "performance_score": {
+        "total_score": 100.0,
+        "grade": "A",
+        "components": {
+          "success_rate_score": 40.0,
+          "response_time_score": 40,
+          "stability_score": 20
+        },
+        "recommendations": [
+          "性能表现良好，建议继续保持当前配置"
+        ]
+      },
+      "alerts": [],
+      "status": "analyzed"
+    },
+    "1101": {
+      "api_code": "1101",
+      "time_range_minutes": 60,
+      "analysis_timestamp": "2025-07-25T09:32:11.537782",
+      "basic_stats": {
+        "total_calls": 26,
+        "successful_calls": 23,
+        "failed_calls": 3,
+        "success_rate": 0.8846153846153846,
+        "error_rate": 0.11538461538461539
+      },
+      "response_time_stats": {
+        "count": 26,
+        "mean": 183.7948076923077,
+        "median": 149.2775,
+        "min": 55.853,
+        "max": 481.803,
+        "std_dev": 121.7529785600399,
+        "p95": 443.082,
+        "p99": 481.803
+      },
+      "error_analysis": {
+        "total_errors": 3,
+        "error_types": {
+          "ConcurrentTestError": 3
+        },
+        "error_rate_by_org": {
+          "org_002": 0.0,
+          "org_001": 0.08333333333333333,
+          "org_003": 0.0,
+          "org_004": 0.2
+        },
+        "most_common_errors": [
+          [
+            "ConcurrentTestError",
+            3
+          ]
+        ]
+      },
+      "time_series_analysis": {
+        "interval_minutes": 5,
+        "time_series": [
+          {
+            "timestamp": "2025-07-25T09:31:47.435140",
+            "calls": 26,
+            "errors": 3,
+            "error_rate": 0.11538461538461539,
+            "avg_response_time": 183.7948076923077
+          }
+        ],
+        "call_trend": null,
+        "response_time_trend": null,
+        "status": "analyzed"
+      },
+      "performance_score": {
+        "total_score": 95.38,
+        "grade": "A",
+        "components": {
+          "success_rate_score": 35.38,
+          "response_time_score": 40,
+          "stability_score": 20
+        },
+        "recommendations": [
+          "成功率偏低，建议检查错误处理逻辑和网络连接稳定性",
+          "错误率偏高，建议加强输入验证和异常处理"
+        ]
+      },
+      "alerts": [
+        "PerformanceAlert(alert_id='1101_error_rate_1753407131', alert_type='error_rate', api_code='1101', org_code='all', threshold_value=0.05, actual_value=0.11538461538461539, severity='critical', timestamp=datetime.datetime(2025, 7, 25, 9, 32, 11, 537761), message='API 1101 错误率 11.54% 超过阈值 5.00%', additional_data={})",
+        "PerformanceAlert(alert_id='1101_success_rate_1753407131', alert_type='success_rate', api_code='1101', org_code='all', threshold_value=0.95, actual_value=0.8846153846153846, severity='warning', timestamp=datetime.datetime(2025, 7, 25, 9, 32, 11, 537761), message='API 1101 成功率 88.46% 低于阈值 95.00%', additional_data={})"
+      ],
+      "status": "analyzed"
+    },
+    "1301": {
+      "api_code": "1301",
+      "time_range_minutes": 60,
+      "analysis_timestamp": "2025-07-25T09:32:11.556548",
+      "basic_stats": {
+        "total_calls": 8,
+        "successful_calls": 8,
+        "failed_calls": 0,
+        "success_rate": 1.0,
+        "error_rate": 0.0
+      },
+      "response_time_stats": {
+        "count": 8,
+        "mean": 487.569,
+        "median": 420.55950000000007,
+        "min": 201.496,
+        "max": 920.7950000000001,
+        "std_dev": 288.7387482809627,
+        "p95": 920.7950000000001,
+        "p99": 920.7950000000001
+      },
+      "error_analysis": {
+        "total_errors": 0,
+        "error_types": {},
+        "error_rate_by_org": {},
+        "most_common_errors": []
+      },
+      "time_series_analysis": {
+        "interval_minutes": 5,
+        "time_series": [
+          {
+            "timestamp": "2025-07-25T09:31:47.645535",
+            "calls": 8,
+            "errors": 0,
+            "error_rate": 0.0,
+            "avg_response_time": 487.56899999999996
+          }
+        ],
+        "call_trend": null,
+        "response_time_trend": null,
+        "status": "analyzed"
+      },
+      "performance_score": {
+        "total_score": 100.0,
+        "grade": "A",
+        "components": {
+          "success_rate_score": 40.0,
+          "response_time_score": 40,
+          "stability_score": 20
+        },
+        "recommendations": [
+          "性能表现良好，建议继续保持当前配置"
+        ]
+      },
+      "alerts": [],
+      "status": "analyzed"
+    },
+    "2207": {
+      "api_code": "2207",
+      "time_range_minutes": 60,
+      "analysis_timestamp": "2025-07-25T09:32:11.556664",
+      "basic_stats": {
+        "total_calls": 6,
+        "successful_calls": 5,
+        "failed_calls": 1,
+        "success_rate": 0.8333333333333334,
+        "error_rate": 0.16666666666666666
+      },
+      "response_time_stats": {
+        "count": 6,
+        "mean": 1277.8701666666666,
+        "median": 1479.0929999999998,
+        "min": 577.88,
+        "max": 1766.53,
+        "std_dev": 498.5286421558612,
+        "p95": 1766.53,
+        "p99": 1766.53
+      },
+      "error_analysis": {
+        "total_errors": 1,
+        "error_types": {
+          "NetworkException": 1
+        },
+        "error_rate_by_org": {
+          "org_003": 0.0,
+          "org_002": 0.0,
+          "org_001": 0.5
+        },
+        "most_common_errors": [
+          [
+            "NetworkException",
+            1
+          ]
+        ]
+      },
+      "time_series_analysis": {
+        "interval_minutes": 5,
+        "time_series": [
+          {
+            "timestamp": "2025-07-25T09:31:48.242151",
+            "calls": 6,
+            "errors": 1,
+            "error_rate": 0.16666666666666666,
+            "avg_response_time": 1277.8701666666666
+          }
+        ],
+        "call_trend": null,
+        "response_time_trend": null,
+        "status": "analyzed"
+      },
+      "performance_score": {
+        "total_score": 90.55,
+        "grade": "A",
+        "components": {
+          "success_rate_score": 33.33,
+          "response_time_score": 37.22,
+          "stability_score": 20
+        },
+        "recommendations": [
+          "成功率偏低，建议检查错误处理逻辑和网络连接稳定性",
+          "错误率偏高，建议加强输入验证和异常处理",
+          "响应时间稳定但偏慢，可能是系统性能瓶颈，建议进行性能调优"
+        ]
+      },
+      "alerts": [
+        "PerformanceAlert(alert_id='2207_error_rate_1753407131', alert_type='error_rate', api_code='2207', org_code='all', threshold_value=0.08, actual_value=0.16666666666666666, severity='critical', timestamp=datetime.datetime(2025, 7, 25, 9, 32, 11, 556650), message='API 2207 错误率 16.67% 超过阈值 8.00%', additional_data={})",
+        "PerformanceAlert(alert_id='2207_success_rate_1753407131', alert_type='success_rate', api_code='2207', org_code='all', threshold_value=0.92, actual_value=0.8333333333333334, severity='warning', timestamp=datetime.datetime(2025, 7, 25, 9, 32, 11, 556650), message='API 2207 成功率 83.33% 低于阈值 92.00%', additional_data={})"
+      ],
+      "status": "analyzed"
+    },
+    "2201": {
+      "api_code": "2201",
+      "time_range_minutes": 60,
+      "analysis_timestamp": "2025-07-25T09:32:11.541064",
+      "basic_stats": {
+        "total_calls": 4,
+        "successful_calls": 4,
+        "failed_calls": 0,
+        "success_rate": 1.0,
+        "error_rate": 0.0
+      },
+      "response_time_stats": {
+        "count": 4,
+        "mean": 1199.25925,
+        "median": 1144.278,
+        "min": 932.9110000000001,
+        "max": 1575.57,
+        "std_dev": 298.6240538752976,
+        "p95": 1575.57,
+        "p99": 1575.57
+      },
+      "error_analysis": {
+        "total_errors": 0,
+        "error_types": {},
+        "error_rate_by_org": {},
+        "most_common_errors": []
+      },
+      "time_series_analysis": {
+        "interval_minutes": 5,
+        "time_series": [
+          {
+            "timestamp": "2025-07-25T09:31:50.572078",
+            "calls": 4,
+            "errors": 0,
+            "error_rate": 0.0,
+            "avg_response_time": 1199.25925
+          }
+        ],
+        "call_trend": null,
+        "response_time_trend": null,
+        "status": "analyzed"
+      },
+      "performance_score": {
+        "total_score": 98.01,
+        "grade": "A",
+        "components": {
+          "success_rate_score": 40.0,
+          "response_time_score": 38.01,
+          "stability_score": 20
+        },
+        "recommendations": [
+          "响应时间稳定但偏慢，可能是系统性能瓶颈，建议进行性能调优"
+        ]
+      },
+      "alerts": [],
+      "status": "analyzed"
+    },
+    "1100": {
+      "api_code": "1100",
+      "time_range_minutes": 60,
+      "analysis_timestamp": "2025-07-25T09:32:11.556911",
+      "basic_stats": {
+        "total_calls": 20,
+        "successful_calls": 19,
+        "failed_calls": 1,
+        "success_rate": 0.95,
+        "error_rate": 0.05
+      },
+      "response_time_stats": {
+        "count": 20,
+        "mean": 125.58395,
+        "median": 134.33749999999998,
+        "min": 54.968999999999994,
+        "max": 195.832,
+        "std_dev": 46.223120866959846,
+        "p95": 195.832,
+        "p99": 195.832
+      },
+      "error_analysis": {
+        "total_errors": 1,
+        "error_types": {
+          "ConcurrentTestError": 1
+        },
+        "error_rate_by_org": {
+          "org_000": 0.1,
+          "org_003": 0.0
+        },
+        "most_common_errors": [
+          [
+            "ConcurrentTestError",
+            1
+          ]
+        ]
+      },
+      "time_series_analysis": {
+        "interval_minutes": 5,
+        "time_series": [
+          {
+            "timestamp": "2025-07-25T09:32:08.610544",
+            "calls": 20,
+            "errors": 1,
+            "error_rate": 0.05,
+            "avg_response_time": 125.58395000000003
+          }
+        ],
+        "call_trend": null,
+        "response_time_trend": null,
+        "status": "analyzed"
+      },
+      "performance_score": {
+        "total_score": 98.0,
+        "grade": "A",
+        "components": {
+          "success_rate_score": 38.0,
+          "response_time_score": 40,
+          "stability_score": 20
+        },
+        "recommendations": [
+          "性能表现良好，建议继续保持当前配置"
+        ]
+      },
+      "alerts": [],
+      "status": "analyzed"
+    },
+    "1102": {
+      "api_code": "1102",
+      "time_range_minutes": 60,
+      "analysis_timestamp": "2025-07-25T09:32:11.557022",
+      "basic_stats": {
+        "total_calls": 10,
+        "successful_calls": 8,
+        "failed_calls": 2,
+        "success_rate": 0.8,
+        "error_rate": 0.2
+      },
+      "response_time_stats": {
+        "count": 10,
+        "mean": 144.3867,
+        "median": 141.234,
+        "min": 112.04,
+        "max": 192.27,
+        "std_dev": 27.6129388876141,
+        "p95": 192.27,
+        "p99": 192.27
+      },
+      "error_analysis": {
+        "total_errors": 2,
+        "error_types": {
+          "ConcurrentTestError": 2
+        },
+        "error_rate_by_org": {
+          "org_002": 0.2
+        },
+        "most_common_errors": [
+          [
+            "ConcurrentTestError",
+            2
+          ]
+        ]
+      },
+      "time_series_analysis": {
+        "interval_minutes": 5,
+        "time_series": [
+          {
+            "timestamp": "2025-07-25T09:32:08.611502",
+            "calls": 10,
+            "errors": 2,
+            "error_rate": 0.2,
+            "avg_response_time": 144.3867
+          }
+        ],
+        "call_trend": null,
+        "response_time_trend": null,
+        "status": "analyzed"
+      },
+      "performance_score": {
+        "total_score": 92.0,
+        "grade": "A",
+        "components": {
+          "success_rate_score": 32.0,
+          "response_time_score": 40,
+          "stability_score": 20
+        },
+        "recommendations": [
+          "成功率偏低，建议检查错误处理逻辑和网络连接稳定性",
+          "错误率偏高，建议加强输入验证和异常处理"
+        ]
+      },
+      "alerts": [],
+      "status": "analyzed"
+    },
+    "demo_api": {
+      "api_code": "demo_api",
+      "time_range_minutes": 60,
+      "analysis_timestamp": "2025-07-25T09:32:11.542592",
+      "basic_stats": {
+        "total_calls": 5,
+        "successful_calls": 5,
+        "failed_calls": 0,
+        "success_rate": 1.0,
+        "error_rate": 0.0
+      },
+      "response_time_stats": {
+        "count": 5,
+        "mean": 192.2044,
+        "median": 196.767,
+        "min": 125.661,
+        "max": 242.10899999999998,
+        "std_dev": 45.362634323857336,
+        "p95": 242.10899999999998,
+        "p99": 242.10899999999998
+      },
+      "error_analysis": {
+        "total_errors": 0,
+        "error_types": {},
+        "error_rate_by_org": {},
+        "most_common_errors": []
+      },
+      "time_series_analysis": {
+        "interval_minutes": 5,
+        "time_series": [
+          {
+            "timestamp": "2025-07-25T09:32:10.059258",
+            "calls": 5,
+            "errors": 0,
+            "error_rate": 0.0,
+            "avg_response_time": 192.2044
+          }
+        ],
+        "call_trend": null,
+        "response_time_trend": null,
+        "status": "analyzed"
+      },
+      "performance_score": {
+        "total_score": 100.0,
+        "grade": "A",
+        "components": {
+          "success_rate_score": 40.0,
+          "response_time_score": 40,
+          "stability_score": 20
+        },
+        "recommendations": [
+          "性能表现良好，建议继续保持当前配置"
+        ]
+      },
+      "alerts": [],
+      "status": "analyzed"
+    }
+  },
+  "overall_performance_score": {
+    "total_score": 96.41,
+    "grade": "A",
+    "status": "calculated"
+  },
+  "recent_alerts": [
+    {
+      "alert_id": "1101_error_rate_1753407131",
+      "alert_type": "error_rate",
+      "api_code": "1101",
+      "severity": "critical",
+      "message": "API 1101 错误率 11.54% 超过阈值 5.00%",
+      "timestamp": "2025-07-25T09:32:11.537761"
+    },
+    {
+      "alert_id": "1101_success_rate_1753407131",
+      "alert_type": "success_rate",
+      "api_code": "1101",
+      "severity": "warning",
+      "message": "API 1101 成功率 88.46% 低于阈值 95.00%",
+      "timestamp": "2025-07-25T09:32:11.537761"
+    },
+    {
+      "alert_id": "2207_error_rate_1753407131",
+      "alert_type": "error_rate",
+      "api_code": "2207",
+      "severity": "critical",
+      "message": "API 2207 错误率 16.67% 超过阈值 8.00%",
+      "timestamp": "2025-07-25T09:32:11.556650"
+    },
+    {
+      "alert_id": "2207_success_rate_1753407131",
+      "alert_type": "success_rate",
+      "api_code": "2207",
+      "severity": "warning",
+      "message": "API 2207 成功率 83.33% 低于阈值 92.00%",
+      "timestamp": "2025-07-25T09:32:11.556650"
+    }
+  ],
+  "alert_summary": {
+    "total_alerts": 4,
+    "critical_alerts": 2,
+    "warning_alerts": 2
+  }
+}

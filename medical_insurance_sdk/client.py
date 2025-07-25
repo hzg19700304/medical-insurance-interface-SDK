@@ -37,7 +37,8 @@ class MedicalInsuranceClient:
 
         self.sdk = MedicalInsuranceSDK(config)
         self.universal_processor = UniversalInterfaceProcessor(self.sdk)
-        self.async_processor = AsyncProcessor()  # Celery异步处理器
+        # 复用SDK的ConfigManager，避免创建新的连接池
+        self.async_processor = AsyncProcessor(self.sdk.config_manager)
         self.logger = logging.getLogger(__name__)
         
         # 异步执行器（用于简单异步任务）

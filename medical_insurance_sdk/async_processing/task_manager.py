@@ -21,7 +21,8 @@ class TaskManager:
             db_config = DatabaseConfig.from_env()
             config_manager = ConfigManager(db_config)
         self.config_manager = config_manager
-        self.db_manager = DatabaseManager(self.config_manager.db_manager.config)
+        # 复用ConfigManager的DatabaseManager，避免创建新连接池
+        self.db_manager = self.config_manager.db_manager
     
     def get_task_status(self, task_id: str) -> Dict[str, Any]:
         """

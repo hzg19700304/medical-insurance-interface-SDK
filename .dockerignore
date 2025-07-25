@@ -1,0 +1,88 @@
+# Docker忽略文件
+# 版本控制
+.git
+.gitignore
+
+# Python
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+env
+pip-log.txt
+pip-delete-this-directory.txt
+.tox
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.log
+.pytest_cache
+
+# 虚拟环境
+venv/
+.venv/
+ENV/
+env/
+.env
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# 操作系统
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# 项目特定
+logs/
+data/
+*.db
+*.sqlite
+*.sqlite3
+
+# 测试和构建
+.pytest_cache/
+htmlcov/
+.coverage
+build/
+dist/
+*.egg-info/
+
+# 文档
+docs/_build/
+
+# 临时文件
+*.tmp
+*.temp
+*.bak
+
+# Docker相关
+Dockerfile*
+docker-compose*.yml
+.dockerignore
+
+# 密钥文件
+secrets/
+*.key
+*.crt
+*.pem
+
+# 配置文件
+.env.local
+.env.production
+
+# 性能测试结果
+stress_test_*.log
+performance_report.*

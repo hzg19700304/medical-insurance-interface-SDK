@@ -347,7 +347,7 @@ class RedisCacheManager:
             'last_health_check': self._last_health_check.isoformat(),
             'connection_pool_info': {
                 'max_connections': self.connection_pool.max_connections,
-                'created_connections': self.connection_pool.created_connections
+                'created_connections': getattr(self.connection_pool, 'created_connections', 0)
             }
         }
     

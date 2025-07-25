@@ -9,7 +9,9 @@ from .core import (
     DataValidator, 
     ProtocolProcessor, 
     MedicalInsuranceHTTPClient,
-    GatewayHeaders
+    GatewayHeaders,
+    MetricsCollector,
+    get_metrics_collector
 )
 from .models.response import MedicalInsuranceResponse
 from .models.request import MedicalInsuranceRequest
@@ -46,6 +48,9 @@ class MedicalInsuranceSDK:
             self.protocol_processor = ProtocolProcessor(self.config_manager)
             self.http_client = MedicalInsuranceHTTPClient(config.http_config)
             
+            # 初始化性能监控
+            self.metrics_collector = get_metrics_collector()
+            
             logger.info("医保SDK初始化完成")
             
         except Exception as e:
@@ -73,6 +78,11 @@ class MedicalInsuranceSDK:
 
         operation_id = self._generate_operation_id()
         start_time = time.time()
+        
+        # 开始性能监控
+        call_id = self.metrics_collector.record_api_call_start(
+            api_code, org_code, len(str(data))
+        )
         
         try:
             logger.info(f"开始调用医保接口: {api_code}, 机构: {org_code}, 操作ID: {operation_id}")
@@ -155,10 +165,20 @@ class MedicalInsuranceSDK:
                 **log_kwargs
             )
             
+            # 记录成功的性能指标
+            self.metrics_collector.record_api_call_end(
+                call_id, 'success', response_size=len(str(response_data))
+            )
+            
             logger.info(f"医保接口调用成功: {api_code}, 耗时: {time.time() - start_time:.3f}秒")
             return response
 
         except ValidationException as e:
+            # 记录验证失败的性能指标
+            self.metrics_collector.record_api_call_end(
+                call_id, 'error', error_code='ValidationException', error_message=str(e)
+            )
+            
             logger.error(f"数据验证失败: {api_code}, 错误: {str(e)}")
             # 从kwargs中移除org_code避免重复传递
             log_kwargs = {k: v for k, v in kwargs.items() if k != 'org_code'}
@@ -176,6 +196,11 @@ class MedicalInsuranceSDK:
             raise
             
         except NetworkException as e:
+            # 记录网络失败的性能指标
+            self.metrics_collector.record_api_call_end(
+                call_id, 'error', error_code='NetworkException', error_message=str(e)
+            )
+            
             logger.error(f"网络请求失败: {api_code}, 错误: {str(e)}")
             # 从kwargs中移除org_code避免重复传递
             log_kwargs = {k: v for k, v in kwargs.items() if k != 'org_code'}
@@ -193,6 +218,11 @@ class MedicalInsuranceSDK:
             raise
             
         except Exception as e:
+            # 记录其他异常的性能指标
+            self.metrics_collector.record_api_call_end(
+                call_id, 'error', error_code=type(e).__name__, error_message=str(e)
+            )
+            
             error_msg = f"接口调用失败: {str(e)}"
             logger.error(f"医保接口调用异常: {api_code}, 错误: {error_msg}")
             # 从kwargs中移除org_code避免重复传递
@@ -294,6 +324,45 @@ class MedicalInsuranceSDK:
         except Exception as e:
             logger.error(f"配置重新加载失败: {str(e)}")
             raise ConfigurationException(f"配置重新加载失败: {str(e)}") from e
+    
+    def get_performance_metrics(self, time_range_minutes: int = 60) -> Dict[str, Any]:
+        """获取性能指标
+        
+        Args:
+            time_range_minutes: 时间范围（分钟）
+            
+        Returns:
+            性能指标数据
+        """
+        try:
+            return self.metrics_collector.get_api_statistics(time_range_minutes)
+        except Exception as e:
+            logger.error(f"获取性能指标失败: {str(e)}")
+            raise MedicalInsuranceException(f"获取性能指标失败: {str(e)}") from e
+    
+    def get_system_metrics(self) -> Dict[str, Any]:
+        """获取系统指标
+        
+        Returns:
+            系统指标数据
+        """
+        try:
+            return self.metrics_collector.get_system_metrics()
+        except Exception as e:
+            logger.error(f"获取系统指标失败: {str(e)}")
+            raise MedicalInsuranceException(f"获取系统指标失败: {str(e)}") from e
+    
+    def get_prometheus_metrics(self) -> str:
+        """获取Prometheus格式的指标数据
+        
+        Returns:
+            Prometheus格式的指标字符串
+        """
+        try:
+            return self.metrics_collector.get_prometheus_metrics()
+        except Exception as e:
+            logger.error(f"获取Prometheus指标失败: {str(e)}")
+            raise MedicalInsuranceException(f"获取Prometheus指标失败: {str(e)}") from e
     
     def close(self):
         """关闭SDK，释放资源"""

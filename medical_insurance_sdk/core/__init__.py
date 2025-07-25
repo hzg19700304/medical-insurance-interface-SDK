@@ -45,6 +45,21 @@ from .error_handler import (
     handle_database_error,
     handle_cache_error
 )
+from .metrics_collector import (
+    MetricsCollector,
+    MetricConfig,
+    PerformanceMetric,
+    APICallMetric,
+    get_metrics_collector,
+    initialize_metrics_collector,
+    monitor_api_call
+)
+from .performance_analyzer import (
+    PerformanceAnalyzer,
+    PerformanceThreshold,
+    PerformanceAlert,
+    PerformanceTrend
+)
 
 __all__ = [
     "DatabaseManager",
@@ -94,4 +109,15 @@ __all__ = [
     "handle_medical_interface_error",
     "handle_database_error",
     "handle_cache_error",
+    "MetricsCollector",
+    "MetricConfig",
+    "PerformanceMetric",
+    "APICallMetric",
+    "get_metrics_collector",
+    "initialize_metrics_collector",
+    "monitor_api_call",
+    "PerformanceAnalyzer",
+    "PerformanceThreshold",
+    "PerformanceAlert",
+    "PerformanceTrend",
 ]

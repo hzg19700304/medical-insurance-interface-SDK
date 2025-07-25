@@ -1,0 +1,94 @@
+2025-07-25 09:14:37,350 - medical_insurance_sdk.core.connection_pool_manager - INFO - 连接池管理器初始化完成
+2025-07-25 09:14:37,421 - medical_insurance_sdk.core.connection_pool_manager - INFO - MySQL连接池 'default' 连接测试成功
+2025-07-25 09:14:37,423 - medical_insurance_sdk.core.connection_pool_manager - INFO - MySQL连接池 'default' 监控线程已启动
+2025-07-25 09:14:37,423 - medical_insurance_sdk.core.connection_pool_manager - INFO - MySQL连接池 'default' 初始化完成
+2025-07-25 09:14:37,424 - medical_insurance_sdk.core.connection_pool_manager - INFO - 创建MySQL连接池 'default' 成功
+2025-07-25 09:14:37,424 - medical_insurance_sdk.core.database - INFO - 数据库健康检查线程已启动
+2025-07-25 09:14:37,425 - medical_insurance_sdk.core.database - INFO - 数据库管理器初始化完成，使用连接池: default
+2025-07-25 09:14:37,425 - medical_insurance_sdk.core.config_manager - INFO - 使用内存缓存管理器
+2025-07-25 09:14:37,426 - medical_insurance_sdk.core.config_manager - INFO - 配置监控线程已启动
+2025-07-25 09:14:37,426 - medical_insurance_sdk.sdk - INFO - 医保SDK初始化完成
+2025-07-25 09:14:37,428 - medical_insurance_sdk.core.connection_pool_manager - WARNING - MySQL连接池 'default' 已存在，将被替换
+2025-07-25 09:14:37,429 - medical_insurance_sdk.core.connection_pool_manager - INFO - MySQL连接池 'default' 已标记关闭
+2025-07-25 09:14:37,498 - medical_insurance_sdk.core.connection_pool_manager - INFO - MySQL连接池 'default' 连接测试成功
+2025-07-25 09:14:37,499 - medical_insurance_sdk.core.connection_pool_manager - INFO - MySQL连接池 'default' 监控线程已启动
+2025-07-25 09:14:37,499 - medical_insurance_sdk.core.connection_pool_manager - INFO - MySQL连接池 'default' 初始化完成
+2025-07-25 09:14:37,499 - medical_insurance_sdk.core.connection_pool_manager - INFO - 创建MySQL连接池 'default' 成功
+2025-07-25 09:14:37,500 - medical_insurance_sdk.core.database - INFO - 数据库健康检查线程已启动
+2025-07-25 09:14:37,500 - medical_insurance_sdk.core.database - INFO - 数据库管理器初始化完成，使用连接池: default
+2025-07-25 09:14:37,501 - medical_insurance_sdk.core.connection_pool_manager - WARNING - MySQL连接池 'default' 已存在，将被替换
+2025-07-25 09:14:37,501 - medical_insurance_sdk.core.connection_pool_manager - INFO - MySQL连接池 'default' 已标记关闭
+2025-07-25 09:14:37,591 - medical_insurance_sdk.core.connection_pool_manager - INFO - MySQL连接池 'default' 连接测试成功
+2025-07-25 09:14:37,592 - medical_insurance_sdk.core.connection_pool_manager - INFO - MySQL连接池 'default' 监控线程已启动
+2025-07-25 09:14:37,593 - medical_insurance_sdk.core.connection_pool_manager - INFO - MySQL连接池 'default' 初始化完成
+2025-07-25 09:14:37,593 - medical_insurance_sdk.core.connection_pool_manager - INFO - 创建MySQL连接池 'default' 成功
+2025-07-25 09:14:37,594 - medical_insurance_sdk.core.database - INFO - 数据库健康检查线程已启动
+2025-07-25 09:14:37,594 - medical_insurance_sdk.core.database - INFO - 数据库管理器初始化完成，使用连接池: default
+2025-07-25 09:14:37,594 - medical_insurance_sdk.client - INFO - 医保接口客户端初始化完成
+2025-07-25 09:14:37,595 - tests.test_performance_stress - INFO - 开始并发接口测试: 1101, 并发用户: 5, 每用户请求: 2
+2025-07-25 09:14:37,595 - medical_insurance_sdk.client - INFO - 同步调用医保接口: 1101, 机构: TEST_ORG
+2025-07-25 09:14:37,596 - medical_insurance_sdk.sdk - INFO - 开始调用医保接口: 1101, 机构: TEST_ORG, 操作ID: bd4bba98-d7ee-4673-950c-8dff8abbaa8d
+2025-07-25 09:14:37,600 - medical_insurance_sdk.sdk - ERROR - 数据验证失败: 1101, 错误: [VALIDATION_ERROR] 输入数据验证失败
+2025-07-25 09:14:37,600 - medical_insurance_sdk.sdk - INFO - API调用日志: bd4bba98-d7ee-4673-950c-8dff8abbaa8d, 1101, validation_failed, 耗时: 0.004秒
+2025-07-25 09:14:37,601 - medical_insurance_sdk.client - ERROR - 同步调用失败: 1101, 错误: [VALIDATION_ERROR] 输入数据验证失败
+2025-07-25 09:14:37,602 - tests.test_performance_stress - WARNING - 请求失败: User 0, Request 0: [VALIDATION_ERROR] 输入数据验证失败
+2025-07-25 09:14:37,602 - medical_insurance_sdk.client - INFO - 同步调用医保接口: 1101, 机构: TEST_ORG
+2025-07-25 09:14:37,602 - medical_insurance_sdk.sdk - INFO - 开始调用医保接口: 1101, 机构: TEST_ORG, 操作ID: d2fdca23-a6c6-4074-b138-6b6e6fa8eb6c
+2025-07-25 09:14:37,603 - medical_insurance_sdk.sdk - ERROR - 数据验证失败: 1101, 错误: [VALIDATION_ERROR] 输入数据验证失败
+2025-07-25 09:14:37,603 - medical_insurance_sdk.sdk - INFO - API调用日志: d2fdca23-a6c6-4074-b138-6b6e6fa8eb6c, 1101, validation_failed, 耗时: 0.001秒
+2025-07-25 09:14:37,603 - medical_insurance_sdk.client - ERROR - 同步调用失败: 1101, 错误: [VALIDATION_ERROR] 输入数据验证失败
+2025-07-25 09:14:37,603 - tests.test_performance_stress - WARNING - 请求失败: User 0, Request 1: [VALIDATION_ERROR] 输入数据验证失败
+2025-07-25 09:14:37,796 - medical_insurance_sdk.client - INFO - 同步调用医保接口: 1101, 机构: TEST_ORG
+2025-07-25 09:14:37,798 - medical_insurance_sdk.sdk - INFO - 开始调用医保接口: 1101, 机构: TEST_ORG, 操作ID: 10233d43-103d-4b1c-a0d3-6c73805ba994
+2025-07-25 09:14:37,798 - medical_insurance_sdk.sdk - ERROR - 数据验证失败: 1101, 错误: [VALIDATION_ERROR] 输入数据验证失败
+2025-07-25 09:14:37,799 - medical_insurance_sdk.sdk - INFO - API调用日志: 10233d43-103d-4b1c-a0d3-6c73805ba994, 1101, validation_failed, 耗时: 0.001秒
+2025-07-25 09:14:37,799 - medical_insurance_sdk.client - ERROR - 同步调用失败: 1101, 错误: [VALIDATION_ERROR] 输入数据验证失败
+2025-07-25 09:14:37,799 - tests.test_performance_stress - WARNING - 请求失败: User 1, Request 0: [VALIDATION_ERROR] 输入数据验证失败
+2025-07-25 09:14:37,799 - medical_insurance_sdk.client - INFO - 同步调用医保接口: 1101, 机构: TEST_ORG
+2025-07-25 09:14:37,800 - medical_insurance_sdk.sdk - INFO - 开始调用医保接口: 1101, 机构: TEST_ORG, 操作ID: da15e125-d2e5-4935-ac6e-04e82f9ed79b
+2025-07-25 09:14:37,801 - medical_insurance_sdk.sdk - ERROR - 数据验证失败: 1101, 错误: [VALIDATION_ERROR] 输入数据验证失败
+2025-07-25 09:14:37,802 - medical_insurance_sdk.sdk - INFO - API调用日志: da15e125-d2e5-4935-ac6e-04e82f9ed79b, 1101, validation_failed, 耗时: 0.002秒
+2025-07-25 09:14:37,802 - medical_insurance_sdk.client - ERROR - 同步调用失败: 1101, 错误: [VALIDATION_ERROR] 输入数据验证失败
+2025-07-25 09:14:37,803 - tests.test_performance_stress - WARNING - 请求失败: User 1, Request 1: [VALIDATION_ERROR] 输入数据验证失败
+2025-07-25 09:14:37,997 - medical_insurance_sdk.client - INFO - 同步调用医保接口: 1101, 机构: TEST_ORG
+2025-07-25 09:14:37,997 - medical_insurance_sdk.sdk - INFO - 开始调用医保接口: 1101, 机构: TEST_ORG, 操作ID: d6ebeea5-42aa-41dc-b4dc-f7186f2d16a5
+2025-07-25 09:14:37,998 - medical_insurance_sdk.sdk - ERROR - 数据验证失败: 1101, 错误: [VALIDATION_ERROR] 输入数据验证失败
+2025-07-25 09:14:37,999 - medical_insurance_sdk.sdk - INFO - API调用日志: d6ebeea5-42aa-41dc-b4dc-f7186f2d16a5, 1101, validation_failed, 耗时: 0.001秒
+2025-07-25 09:14:37,999 - medical_insurance_sdk.client - ERROR - 同步调用失败: 1101, 错误: [VALIDATION_ERROR] 输入数据验证失败
+2025-07-25 09:14:38,000 - tests.test_performance_stress - WARNING - 请求失败: User 2, Request 0: [VALIDATION_ERROR] 输入数据验证失败
+2025-07-25 09:14:38,000 - medical_insurance_sdk.client - INFO - 同步调用医保接口: 1101, 机构: TEST_ORG
+2025-07-25 09:14:38,000 - medical_insurance_sdk.sdk - INFO - 开始调用医保接口: 1101, 机构: TEST_ORG, 操作ID: e74aa4c5-3aa5-4cfa-8500-635835607171
+2025-07-25 09:14:38,001 - medical_insurance_sdk.sdk - ERROR - 数据验证失败: 1101, 错误: [VALIDATION_ERROR] 输入数据验证失败
+2025-07-25 09:14:38,001 - medical_insurance_sdk.sdk - INFO - API调用日志: e74aa4c5-3aa5-4cfa-8500-635835607171, 1101, validation_failed, 耗时: 0.001秒
+2025-07-25 09:14:38,001 - medical_insurance_sdk.client - ERROR - 同步调用失败: 1101, 错误: [VALIDATION_ERROR] 输入数据验证失败
+2025-07-25 09:14:38,002 - tests.test_performance_stress - WARNING - 请求失败: User 2, Request 1: [VALIDATION_ERROR] 输入数据验证失败
+2025-07-25 09:14:38,197 - medical_insurance_sdk.client - INFO - 同步调用医保接口: 1101, 机构: TEST_ORG
+2025-07-25 09:14:38,198 - medical_insurance_sdk.sdk - INFO - 开始调用医保接口: 1101, 机构: TEST_ORG, 操作ID: 7536169b-20e8-4641-b237-ba99d23ac819
+2025-07-25 09:14:38,198 - medical_insurance_sdk.sdk - ERROR - 数据验证失败: 1101, 错误: [VALIDATION_ERROR] 输入数据验证失败
+2025-07-25 09:14:38,199 - medical_insurance_sdk.sdk - INFO - API调用日志: 7536169b-20e8-4641-b237-ba99d23ac819, 1101, validation_failed, 耗时: 0.001秒
+2025-07-25 09:14:38,199 - medical_insurance_sdk.client - ERROR - 同步调用失败: 1101, 错误: [VALIDATION_ERROR] 输入数据验证失败
+2025-07-25 09:14:38,200 - tests.test_performance_stress - WARNING - 请求失败: User 3, Request 0: [VALIDATION_ERROR] 输入数据验证失败
+2025-07-25 09:14:38,201 - medical_insurance_sdk.client - INFO - 同步调用医保接口: 1101, 机构: TEST_ORG
+2025-07-25 09:14:38,201 - medical_insurance_sdk.sdk - INFO - 开始调用医保接口: 1101, 机构: TEST_ORG, 操作ID: 2d8aefc4-b3f1-4553-808d-c0e30d4399f7
+2025-07-25 09:14:38,202 - medical_insurance_sdk.sdk - ERROR - 数据验证失败: 1101, 错误: [VALIDATION_ERROR] 输入数据验证失败
+2025-07-25 09:14:38,202 - medical_insurance_sdk.sdk - INFO - API调用日志: 2d8aefc4-b3f1-4553-808d-c0e30d4399f7, 1101, validation_failed, 耗时: 0.001秒
+2025-07-25 09:14:38,203 - medical_insurance_sdk.client - ERROR - 同步调用失败: 1101, 错误: [VALIDATION_ERROR] 输入数据验证失败
+2025-07-25 09:14:38,203 - tests.test_performance_stress - WARNING - 请求失败: User 3, Request 1: [VALIDATION_ERROR] 输入数据验证失败
+2025-07-25 09:14:38,398 - medical_insurance_sdk.client - INFO - 同步调用医保接口: 1101, 机构: TEST_ORG
+2025-07-25 09:14:38,398 - medical_insurance_sdk.sdk - INFO - 开始调用医保接口: 1101, 机构: TEST_ORG, 操作ID: 9c9a67e3-d5ed-469f-a6a9-e6d664b4beac
+2025-07-25 09:14:38,398 - medical_insurance_sdk.sdk - ERROR - 数据验证失败: 1101, 错误: [VALIDATION_ERROR] 输入数据验证失败
+2025-07-25 09:14:38,399 - medical_insurance_sdk.sdk - INFO - API调用日志: 9c9a67e3-d5ed-469f-a6a9-e6d664b4beac, 1101, validation_failed, 耗时: 0.001秒
+2025-07-25 09:14:38,399 - medical_insurance_sdk.client - ERROR - 同步调用失败: 1101, 错误: [VALIDATION_ERROR] 输入数据验证失败
+2025-07-25 09:14:38,399 - tests.test_performance_stress - WARNING - 请求失败: User 4, Request 0: [VALIDATION_ERROR] 输入数据验证失败
+2025-07-25 09:14:38,400 - medical_insurance_sdk.client - INFO - 同步调用医保接口: 1101, 机构: TEST_ORG
+2025-07-25 09:14:38,400 - medical_insurance_sdk.sdk - INFO - 开始调用医保接口: 1101, 机构: TEST_ORG, 操作ID: c8e3ade3-52f0-49a2-ad1c-46ec7988eb98
+2025-07-25 09:14:38,401 - medical_insurance_sdk.sdk - ERROR - 数据验证失败: 1101, 错误: [VALIDATION_ERROR] 输入数据验证失败
+2025-07-25 09:14:38,402 - medical_insurance_sdk.sdk - INFO - API调用日志: c8e3ade3-52f0-49a2-ad1c-46ec7988eb98, 1101, validation_failed, 耗时: 0.001秒
+2025-07-25 09:14:38,402 - medical_insurance_sdk.client - ERROR - 同步调用失败: 1101, 错误: [VALIDATION_ERROR] 输入数据验证失败
+2025-07-25 09:14:38,402 - tests.test_performance_stress - WARNING - 请求失败: User 4, Request 1: [VALIDATION_ERROR] 输入数据验证失败
+2025-07-25 09:14:38,405 - tests.test_performance_stress - INFO - 并发接口测试完成: {'test_name': '并发接口测试_1101', 'total_requests': 10, 'successful_requests': 0, 'failed_requests': 10, 'total_time': 0.808, 'average_response_time': 0.003, 'min_response_time': 0.002, 'max_response_time': 0.006, 'p95_response_time': 0.006, 'p99_response_time': 0.006, 'requests_per_second': 12.37, 'error_rate': 100.0, 'error_count': 10, 'unique_errors': 10}
+2025-07-25 09:14:38,407 - tests.test_performance_stress - INFO - 开始数据库连接池测试: 并发连接: 10, 每连接操作: 5
+2025-07-25 09:14:38,836 - tests.test_performance_stress - INFO - 数据库连接池测试完成: {'test_name': '数据库连接池性能测试', 'total_requests': 50, 'successful_requests': 50, 'failed_requests': 0, 'total_time': 0.429, 'average_response_time': 0.011, 'min_response_time': 0.001, 'max_response_time': 0.085, 'p95_response_time': 0.037, 'p99_response_time': 0.085, 'requests_per_second': 116.57, 'error_rate': 0.0, 'error_count': 0, 'unique_errors': 0}
+2025-07-25 09:14:38,838 - tests.test_performance_stress - INFO - 开始缓存系统测试: 并发操作: 10, 每工作线程操作: 20
+2025-07-25 09:14:38,839 - medical_insurance_sdk.core.cache_manager - INFO - Redis健康检查线程已启动
+2025-07-25 09:14:40,918 - medical_insurance_sdk.core.cache_manager - INFO - Redis连接测试成功
